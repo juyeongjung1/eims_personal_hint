@@ -111,7 +111,7 @@ long hour = minScore / 60;      // ⑥：残った商 → “時間”を取得
 12345 ミリ秒は、12秒345             ← hour=0, min=0 ⇒ 「分」をスキップ
 ```
 
-![演習1.2 文字列出力の条件文](assets/eims-hints/page-04-image-01.png)
+![演習1.2 文字列出力の条件文とMainメソッド](./assets/eims-hints/page-04.png)
 
 ### 文字列の組み立て
 
@@ -136,7 +136,7 @@ for (int i = 0; i < 4; i++) {
 }
 ```
 
-![演習1.2 Mainメソッドですること](assets/eims-hints/page-04-image-02.png)
+![演習1.2 Mainメソッドですること](./assets/eims-hints/page-04.png)
 
 ## 演習2.1 のヒント
 
@@ -180,7 +180,7 @@ for (String word : keywords) {
 
 ※テキストの38～41行を参照してください。
 
-![演習2.2 Scoreクラス仕様](assets/eims-hints/page-06-image-01.png)
+![演習2.2 Scoreクラス仕様](./assets/eims-hints/page-06.png)
 
 ### コンストラクタ実装
 
@@ -238,19 +238,19 @@ public String toString() {
 
 ### 1. Java API をブラウザで検索し、APIサイトに接続
 
-![Java API検索結果](assets/eims-hints/page-08-image-01.png)
+![Java API検索結果](./assets/eims-hints/page-08.png)
 
 ### 2. 右上の検索バーに、調べたいクラス（今回は `System`）を検索し、クリックする
 
-![Systemクラスの検索](assets/eims-hints/page-08-image-02.png)
+![Systemクラスの検索](./assets/eims-hints/page-08.png)
 
-![Systemクラス検索候補](assets/eims-hints/page-08-image-03.png)
+![Systemクラス検索候補](./assets/eims-hints/page-08.png)
 
 ### 3. メソッドの概要を探せば、すぐ見つかる
 
 ブラウザの翻訳Onを推奨します。
 
-![currentTimeMillisメソッド](assets/eims-hints/page-09-image-01.png)
+![currentTimeMillisメソッド](./assets/eims-hints/page-09.png)
 
 `static` が付いているので、呼び出す時は、`System.currentTimeMillis();` と呼び出さないといけないこともわかります。
 
