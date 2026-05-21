@@ -478,25 +478,21 @@ System.out.println(name + "さんの結果：" + s.____());
 
 ```sql
 -- ① typinguser でログイン
--- ヒント：ユーザ名は typinguser、パスワードは問題文の指定を使う
-mysql -u____ -p____
+mysql -utypinguser -ppassword
 
 -- ② 使用 DB 指定
--- ヒント：作成したデータベース名を指定する
-USE ____;
+USE typingdb;
 
 -- ③ テーブル作成
 CREATE TABLE score (
-    -- ヒント：主キーは自動採番にする
-    no INT __________ PRIMARY KEY,
-    -- ヒント：名前は20文字まで
-    name VARCHAR(__),
+    no INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(20),
     score INT,
     datetime DATETIME
 );
 
 -- ④ 構造確認
-DESC ____;
+DESC score;
 exit;
 ```
 
@@ -516,8 +512,7 @@ exit;
 ```sql
 -- ① レコード追加（現在日時は NOW()）
 INSERT INTO score(name, score, datetime)
--- ヒント：nameには文字列、scoreには数値、datetimeには NOW() を入れる
-VALUES('____', ____, NOW());
+VALUES('たろう', 123456, NOW());
 
 -- ② 登録確認
 SELECT * FROM score;
@@ -525,23 +520,21 @@ SELECT * FROM score;
 -- ③ ソート表示（スコア小→大）
 SELECT name, score, datetime
   FROM score
--- ヒント：小さいスコア順に並べるので、score列で並べる
- ORDER BY ____;
+ ORDER BY score;
 
 -- ④ 名前の更新
 UPDATE score
--- ヒント：SET は変更後、WHERE は変更前の名前
-   SET name = '____'
- WHERE name = '____';
+   SET name = '太郎'
+ WHERE name = 'たろう';
 
 -- ⑤ レコード削除
 DELETE FROM score
- WHERE name = '____';
+ WHERE name = '太郎';
 
 exit;
 ```
 
-SQLは、先に `SELECT` で現在の状態を確認してから `UPDATE` や `DELETE` を実行すると安心です。特に `WHERE` 句は「どの行だけを対象にするか」を決める部分なので、空欄のままにせず、対象の名前を正確に入れてください。
+SQLは、先に `SELECT` で現在の状態を確認してから `UPDATE` や `DELETE` を実行すると安心です。特に `WHERE` 句は「どの行だけを対象にするか」を決める部分なので、対象の名前を正確に確認してください。
 
 ### 注意点
 
@@ -597,7 +590,8 @@ public ArrayList<Score> select() {
         Statement stmt = con.createStatement();
 
         // ★SELECT文を実行すると、結果は ResultSet として返ってくる
-        ResultSet rs = stmt.executeQuery(sql);
+        // ヒント：SELECT用の実行メソッド。executeUpdate ではありません。
+        ResultSet rs = stmt.____(sql);
 
         // ★次の行がある間だけループする
         while (rs.next()) {
@@ -674,7 +668,8 @@ public void insert(Score score) {
         ps.setLong(2, score.____());
 
         // ★INSERT文を実行する
-        ps.executeUpdate();
+        // ヒント：INSERT/UPDATE/DELETE用の実行メソッドです。
+        ps.____();
     } catch (SQLException e) {
         e.printStackTrace();
     }
