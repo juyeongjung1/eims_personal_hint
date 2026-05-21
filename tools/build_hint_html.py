@@ -26,8 +26,14 @@ def inline(text: str) -> str:
 
 
 def code_html(code: str, lang: str) -> str:
-    escaped = html.escape(code.rstrip("\n"))
-    escaped = escaped.replace("____", '<span class="blank">____</span>')
+    escaped_lines = []
+    for line in html.escape(code.rstrip("\n")).splitlines():
+        line = line.replace("____", '<span class="blank">____</span>')
+        stripped = line.strip()
+        if stripped.startswith("// ★") or stripped.startswith("// ヒント"):
+            line = f'<span class="code-comment">{line}</span>'
+        escaped_lines.append(line)
+    escaped = "\n".join(escaped_lines)
     label = html.escape(lang or "code")
     return (
         f'<div class="code-shell" data-lang="{label}">'
@@ -128,7 +134,7 @@ def render_blocks(markdown: str) -> tuple[str, list[tuple[str, str]]]:
             parts.append(
                 f'<header class="doc-hero"><p class="kicker">EIMS 個人演習</p>'
                 f"<h1>{inline(title)}</h1>"
-                f"<p>ヒントを演習ごとに整理し、参照テキスト・コード・画像を読みやすくまとめたHTML版です。</p></header>"
+        f"<p>ヒントを演習ごとに整理し、参照テキスト・コード・重要ポイントを読みやすくまとめたHTML版です。</p></header>"
             )
             i += 1
             continue
@@ -207,12 +213,16 @@ def build_html(body: str, toc: list[tuple[str, str]]) -> str:
   --ink: #1d2528;
   --muted: #5b676c;
   --line: #d9dfdc;
+  --line-strong: #bdc9c4;
   --green: #1f7a62;
   --green-soft: #e6f3ee;
   --amber: #946200;
   --amber-soft: #fff3d6;
-  --code: #101820;
+  --code-bg: #fbfcfa;
+  --code-head: #eef4f1;
+  --code-line: #ccd8d3;
   --blue: #2f5f9e;
+  --red: #b43d2d;
 }}
 * {{ box-sizing: border-box; }}
 body {{
@@ -256,18 +266,46 @@ p {{ margin: 10px 0; }}
   padding: 28px; margin: 22px 0; box-shadow: 0 1px 2px rgba(20, 30, 28, 0.04);
 }}
 .reference {{
-  border-left: 5px solid var(--green); background: var(--green-soft);
-  padding: 12px 14px; margin: 14px 0; border-radius: 0 6px 6px 0; font-weight: 700;
+  border-left: 6px solid var(--green); background: var(--green-soft);
+  padding: 13px 15px; margin: 16px 0; border-radius: 0 6px 6px 0; font-weight: 700;
+  box-shadow: inset 0 0 0 1px rgba(31, 122, 98, 0.08);
 }}
-.lead-label {{ font-weight: 700; color: var(--green); margin-top: 18px; }}
+.lead-label {{
+  font-weight: 700; color: var(--green); margin-top: 20px; padding: 8px 10px;
+  background: #f1f7f4; border-left: 4px solid var(--green); border-radius: 0 5px 5px 0;
+}}
 ul, ol {{ padding-left: 1.4rem; }}
 li {{ margin: 5px 0; }}
 code {{ background: #eef2f1; padding: 0.1em 0.35em; border-radius: 4px; font-family: Consolas, "Courier New", monospace; }}
-.code-shell {{ background: var(--code); color: #edf7f5; border-radius: 8px; overflow: hidden; margin: 16px 0; }}
-.code-toolbar {{ display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: #17242d; color: #b9c9c7; font-size: 12px; }}
-.code-toolbar button {{ border: 1px solid #48606b; background: #22333d; color: white; border-radius: 5px; padding: 4px 8px; cursor: pointer; }}
-pre {{ margin: 0; padding: 16px; overflow: auto; font-family: Consolas, "Courier New", monospace; font-size: 14px; line-height: 1.6; }}
-.blank {{ background: var(--amber-soft); color: #2b1b00; border: 1px solid #e3bd66; border-radius: 4px; padding: 0 3px; font-weight: 700; }}
+.code-shell {{
+  background: var(--code-bg); color: #172126; border: 1px solid var(--code-line);
+  border-radius: 8px; overflow: hidden; margin: 18px 0;
+  box-shadow: 0 1px 2px rgba(20, 30, 28, 0.05);
+}}
+.code-toolbar {{
+  display: flex; justify-content: space-between; align-items: center; padding: 8px 12px;
+  background: var(--code-head); color: #2e4b45; font-size: 12px; border-bottom: 1px solid var(--code-line);
+}}
+.code-toolbar span {{
+  font-weight: 700; letter-spacing: 0; text-transform: uppercase;
+}}
+.code-toolbar button {{
+  border: 1px solid var(--line-strong); background: white; color: #1f3a36;
+  border-radius: 5px; padding: 4px 8px; cursor: pointer;
+}}
+pre {{
+  margin: 0; padding: 16px; overflow: auto; font-family: Consolas, "Courier New", monospace;
+  font-size: 14px; line-height: 1.65; white-space: pre;
+}}
+.code-comment {{
+  display: inline-block; width: 100%; color: #6f4e00; background: #fff7df;
+  border-left: 4px solid #e3b341; padding-left: 8px; margin-left: -8px;
+}}
+.blank {{
+  background: #ffe08a; color: #241600; border: 1px solid #c88a00;
+  border-radius: 4px; padding: 0 4px; font-weight: 800;
+  box-shadow: 0 0 0 2px rgba(255, 224, 138, 0.35);
+}}
 .table-wrap {{ overflow: auto; margin: 16px 0; border: 1px solid var(--line); border-radius: 8px; }}
 table {{ width: 100%; border-collapse: collapse; background: white; font-size: 14px; }}
 th, td {{ border-bottom: 1px solid var(--line); padding: 10px 12px; vertical-align: top; }}

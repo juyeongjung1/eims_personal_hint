@@ -283,17 +283,41 @@ public String toString() {
 
 ### 1. Java API をブラウザで検索し、APIサイトに接続
 
-![Java API検索結果](./assets/eims-hints/page-08.png)
+ブラウザで `java api` と検索し、Oracle の Java API ドキュメントを開きます。
+
+| 操作 | 見る場所 | 確認すること |
+| --- | --- | --- |
+| `java api` と検索する | 検索結果 | Oracle の Java API ドキュメントを選ぶ |
+| APIページを開く | ページ上部または右上 | クラス検索欄を探す |
+| 日本語表示にしたい場合 | ブラウザ翻訳 | メソッド説明を読みやすくする |
 
 ### 2. 右上の検索バーに、調べたいクラス（今回は `System`）を検索し、クリックする
 
-上のスクショの下半分に、APIページ右上の検索欄があります。そこへ `System` と入力し、候補に出る `java.lang.System` を選択します。
+APIページの検索欄へ `System` と入力し、候補に出る `java.lang.System` を選択します。
+
+```text
+検索欄に入力する文字: System
+選択する候補: java.lang.System
+探したいメソッド: currentTimeMillis()
+```
 
 ### 3. メソッドの概要を探せば、すぐ見つかる
 
 ブラウザの翻訳Onを推奨します。
 
-![currentTimeMillisメソッド](./assets/eims-hints/page-09.png)
+`System` クラスのメソッド一覧で、`currentTimeMillis()` を探します。次の点を確認してください。
+
+| 見るポイント | 意味 |
+| --- | --- |
+| `static` | インスタンスを作らず、`System.currentTimeMillis()` と呼び出せる |
+| 戻り値 `long` | ミリ秒の時刻は `long` 型で受け取る |
+| メソッド名 `currentTimeMillis()` | 現在時刻をミリ秒で取得する |
+
+APIで見つけた情報をコードに直すと、次の1行になります。
+
+```java
+long now = System.currentTimeMillis();
+```
 
 `static` が付いているので、呼び出す時は、`System.currentTimeMillis();` と呼び出さないといけないこともわかります。
 
