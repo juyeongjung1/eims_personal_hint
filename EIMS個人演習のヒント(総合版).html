@@ -166,7 +166,13 @@ long hour = minScore / 60;      // ⑥：残った商 → “時間”を取得
 1234567 ミリ秒は、20分34秒567      ← hour=0 ⇒ 「時間」部分をスキップ
 123456 ミリ秒は、2分3秒456          ← hour=0, secScore=123 ⇒ 「秒」も残る
 12345 ミリ秒は、12秒345             ← hour=0, min=0 ⇒ 「分」をスキップ</code></pre></div>
-<figure><img src="./assets/eims-hints/page-04.png" alt="演習1.2 文字列出力の条件文とMainメソッド" loading="lazy"><figcaption>演習1.2 文字列出力の条件文とMainメソッド</figcaption></figure>
+<p>出力する・しないの判断は、次のように整理できます。</p>
+<div class="table-wrap"><table><thead><tr><th>単位</th><th>変数</th><th>表示する条件</th><th>表示例</th></tr></thead><tbody><tr><td>時間</td><td><code>hour</code></td><td><code>hour &gt; 0</code> のときだけ</td><td><code>3時間</code></td></tr><tr><td>分</td><td><code>min</code></td><td><code>min &gt; 0</code> のときだけ</td><td><code>25分</code></td></tr><tr><td>秒</td><td><code>sec</code></td><td><code>sec &gt; 0</code> のときだけ</td><td><code>45秒</code></td></tr><tr><td>ミリ秒</td><td><code>msec</code></td><td><code>msec &gt; 0</code> のときだけ</td><td><code>678</code></td></tr></tbody></table></div>
+<p>ポイントは「0の単位は表示しない」ことです。先頭から順番に、時間、分、秒、ミリ秒を必要なときだけ文字列へ追加していきます。</p>
+<div class="code-shell" data-lang="text"><div class="code-toolbar"><span>text</span><button type="button">コピー</button></div><pre><code>hour が 0 より大きい？ → はい：時間を追加 / いいえ：何もしない
+min  が 0 より大きい？ → はい：分を追加   / いいえ：何もしない
+sec  が 0 より大きい？ → はい：秒を追加   / いいえ：何もしない
+msec が 0 より大きい？ → はい：ミリ秒を追加 / いいえ：何もしない</code></pre></div>
 <h3>文字列の組み立て</h3>
 <div class="code-shell" data-lang="java"><div class="code-toolbar"><span>java</span><button type="button">コピー</button></div><pre><code>if (hour &gt; 0) {
     strScore = hour + &quot;時間&quot;;
@@ -179,7 +185,9 @@ long hour = minScore / 60;      // ⑥：残った商 → “時間”を取得
     System.out.println(score + &quot;ミリ秒は、&quot; + getStringScore(score));
     score /= 10;
 }</code></pre></div>
-<figure><img src="./assets/eims-hints/page-04.png" alt="演習1.2 Mainメソッドですること" loading="lazy"><figcaption>演習1.2 Mainメソッドですること</figcaption></figure>
+<p>この <code>for</code> 文は、同じメソッドをいろいろな桁のスコアで試すための確認用です。</p>
+<div class="table-wrap"><table><thead><tr><th>繰り返し</th><th>表示に使う <code>score</code></th><th>確認したいこと</th></tr></thead><tbody><tr><td>1回目</td><td><code>12345678</code></td><td>時間・分・秒・ミリ秒がすべて出るか</td></tr><tr><td>2回目</td><td><code>1234567</code></td><td>時間が0のとき、時間を出さないか</td></tr><tr><td>3回目</td><td><code>123456</code></td><td>分・秒・ミリ秒だけで表示できるか</td></tr><tr><td>4回目</td><td><code>12345</code></td><td>分が0のとき、分を出さないか</td></tr></tbody></table></div>
+<p>毎回 <code>score /= 10;</code> で値を小さくするので、表示条件が正しく動いているかをまとめて確認できます。</p>
 </section>
 <section class="exercise" id="演習2.1-のヒント" data-title="演習2.1 のヒント"><h2>演習2.1 のヒント</h2>
 <h3>仕様のポイント</h3>
@@ -206,7 +214,14 @@ long hour = minScore / 60;      // ⑥：残った商 → “時間”を取得
 <p>コンストラクタの引数は3つなのに、フィールドは4つありますよね。</p>
 <p>コンストラクタの引数を、そのままフィールドに代入して初期化する、今までの常識を変える必要があります。4つ目の <code>String score</code> に、何を入れるべきでしょうか。</p>
 <aside class="reference">※「Java によるオブジェクト指向プログラミング」 38～41ページ を参照してください。</aside>
-<figure><img src="./assets/eims-hints/page-06.png" alt="演習2.2 Scoreクラス仕様" loading="lazy"><figcaption>演習2.2 Scoreクラス仕様</figcaption></figure>
+<p><code>Score</code> クラスで考えるものは、次の4つのフィールドです。コンストラクタの引数は3つですが、表示用の <code>score</code> はコンストラクタの中で作ります。</p>
+<div class="table-wrap"><table><thead><tr><th>種類</th><th>名前</th><th>型</th><th>役割</th></tr></thead><tbody><tr><td>フィールド</td><td><code>name</code></td><td><code>String</code></td><td>入力された名前を保存する</td></tr><tr><td>フィールド</td><td><code>longScore</code></td><td><code>long</code></td><td>ミリ秒のスコアを数値のまま保存する</td></tr><tr><td>フィールド</td><td><code>date</code></td><td><code>String</code></td><td>記録日時を文字列で保存する</td></tr><tr><td>フィールド</td><td><code>score</code></td><td><code>String</code></td><td>表示用に変換したスコアを保存する</td></tr><tr><td>コンストラクタ引数</td><td><code>name</code></td><td><code>String</code></td><td><code>this.name</code> に入れる</td></tr><tr><td>コンストラクタ引数</td><td><code>longScore</code></td><td><code>long</code></td><td><code>this.longScore</code> に入れ、さらに表示用スコアの変換にも使う</td></tr><tr><td>コンストラクタ引数</td><td><code>date</code></td><td><code>String</code></td><td><code>this.date</code> に入れる</td></tr></tbody></table></div>
+<p>データの流れは、次のように考えると分かりやすいです。</p>
+<div class="code-shell" data-lang="text"><div class="code-toolbar"><span>text</span><button type="button">コピー</button></div><pre><code>longScore（数値のスコア）
+    ↓ getStringScore(longScore) で変換
+score（表示用の文字列）
+    ↓ toString() で名前・日付とつなげる
+世界太郎, 2分3秒456, 2020/01/01 12:34:56</code></pre></div>
 <h3>コンストラクタ実装</h3>
 <div class="code-shell" data-lang="java"><div class="code-toolbar"><span>java</span><button type="button">コピー</button></div><pre><code>public Score(String name, long longScore, String date) {
     this.name      = name;
@@ -240,8 +255,7 @@ public String toString() {
 <h3>1. Java API をブラウザで検索し、APIサイトに接続</h3>
 <figure><img src="./assets/eims-hints/page-08.png" alt="Java API検索結果" loading="lazy"><figcaption>Java API検索結果</figcaption></figure>
 <h3>2. 右上の検索バーに、調べたいクラス（今回は <code>System</code>）を検索し、クリックする</h3>
-<figure><img src="./assets/eims-hints/page-08.png" alt="Systemクラスの検索" loading="lazy"><figcaption>Systemクラスの検索</figcaption></figure>
-<figure><img src="./assets/eims-hints/page-08.png" alt="Systemクラス検索候補" loading="lazy"><figcaption>Systemクラス検索候補</figcaption></figure>
+<p>上のスクショの下半分に、APIページ右上の検索欄があります。そこへ <code>System</code> と入力し、候補に出る <code>java.lang.System</code> を選択します。</p>
 <h3>3. メソッドの概要を探せば、すぐ見つかる</h3>
 <p>ブラウザの翻訳Onを推奨します。</p>
 <figure><img src="./assets/eims-hints/page-09.png" alt="currentTimeMillisメソッド" loading="lazy"><figcaption>currentTimeMillisメソッド</figcaption></figure>
