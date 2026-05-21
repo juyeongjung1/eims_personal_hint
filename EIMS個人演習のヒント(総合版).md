@@ -403,20 +403,30 @@ sw.start();
 ```java
 while (keywords.size() > 0) {
     // ★残り問題数を表示する
-    // ヒント：問題リストのサイズを使う
+    // ヒント：keywords.size() を文字列とつなげる
+    System.out.println("あと" + keywords.____() + "問");
 
     // ★先頭の問題を表示して、入力を1行受け取る
-    // ヒント：リストの0番目を使う
+    // ヒント：リストの0番目は keywords.get(0)
+    System.out.print(keywords.____(0) + "> ");
+    String line = KB.readLine();
 
-    if (/* 入力文字列と現在の問題が等しいか */) {
+    // ★文字列の比較なので == ではなく equals を使う
+    // ヒント：line と keywords.get(0) を比較する
+    if (line.equals(____)) {
         // ★正解なら、出題済みの先頭問題を削除する
+        keywords.remove(____);
 
         // ★残り問題の出題順をランダム化する
+        Collections.shuffle(____);
     } else {
         // ★不正解時のメッセージを表示する
+        System.out.println("____");
     }
 }
 ```
+
+ここでは、変数名が混ざりやすいです。問題リストは `keywords`、入力された文字列は `line` と考えると整理しやすくなります。
 
 実行例:
 
@@ -433,10 +443,15 @@ byte> byte
 
 ```java
 // ★時間計測を止める
+sw.stop();
 
 // ★名前、計測結果、任意の日付文字列を使って Score を作る
+// ヒント：new Score(名前, long型のスコア, 任意の文字列)
+Score s = new Score(____, sw.getLongScore(), "now");
 
 // ★終了メッセージと結果を表示する
+System.out.println("終了！");
+System.out.println(name + "さんの結果：" + s.____());
 
 // ここに、結果を出力するコードを書いてください。
 ```
@@ -463,14 +478,18 @@ byte> byte
 
 ```sql
 -- ① typinguser でログイン
+-- ヒント：ユーザ名は typinguser、パスワードは問題文の指定を使う
 mysql -u____ -p____
 
 -- ② 使用 DB 指定
+-- ヒント：作成したデータベース名を指定する
 USE ____;
 
 -- ③ テーブル作成
 CREATE TABLE score (
+    -- ヒント：主キーは自動採番にする
     no INT __________ PRIMARY KEY,
+    -- ヒント：名前は20文字まで
     name VARCHAR(__),
     score INT,
     datetime DATETIME
@@ -497,6 +516,7 @@ exit;
 ```sql
 -- ① レコード追加（現在日時は NOW()）
 INSERT INTO score(name, score, datetime)
+-- ヒント：nameには文字列、scoreには数値、datetimeには NOW() を入れる
 VALUES('____', ____, NOW());
 
 -- ② 登録確認
@@ -505,10 +525,12 @@ SELECT * FROM score;
 -- ③ ソート表示（スコア小→大）
 SELECT name, score, datetime
   FROM score
+-- ヒント：小さいスコア順に並べるので、score列で並べる
  ORDER BY ____;
 
 -- ④ 名前の更新
 UPDATE score
+-- ヒント：SET は変更後、WHERE は変更前の名前
    SET name = '____'
  WHERE name = '____';
 
@@ -541,8 +563,10 @@ SQLは、先に `SELECT` で現在の状態を確認してから `UPDATE` や `D
 ```java
 public void connectTest() {
     // ★ここで DB に接続してからメッセージを出す
-    try (Connection con = DriverManager.getConnection(____, ____, ____)) {
+    // ヒント：引数は ScoreDAO のフィールド url, user, pass を使う
+    try (Connection con = DriverManager.getConnection(url, ____, ____)) {
         // ★接続できたことが分かるメッセージを表示する
+        System.out.println("接続しました。");
     } catch (SQLException e) {
         e.printStackTrace(); // ★例外時は必ずスタックトレース
     }
@@ -567,21 +591,28 @@ public ArrayList<Score> select() {
     String sql = "SELECT name, score, datetime FROM score ORDER BY score";
     ArrayList<Score> list = new ArrayList<>(); // ★リストのインスタンスを予め宣言（空っぽのリスト生成）
 
-    try (Connection con = DriverManager.getConnection(____, ____, ____)) {
-        Statement stmt = con.____();
-        ResultSet rs = stmt.____(sql);
+    // ヒント：接続情報はフィールドの url, user, pass を使う
+    try (Connection con = DriverManager.getConnection(url, ____, ____)) {
+        // ★SQLを実行するための Statement を作る
+        Statement stmt = con.createStatement();
 
-        while (rs.____()) {
+        // ★SELECT文を実行すると、結果は ResultSet として返ってくる
+        ResultSet rs = stmt.executeQuery(sql);
+
+        // ★次の行がある間だけループする
+        while (rs.next()) {
             // ★ResultSet から name, score, datetime を取り出す
+            // ヒント：列名はSQL文の SELECT の後に書いた名前と同じ
             String name = rs.getString("____");
             long sc = rs.getLong("____");
             String dt = rs.getString("____");
 
             // ★取り出した3つの値で Score インスタンスを作る
-            Score s = new Score(____, ____, ____);
+            // ヒント：Scoreの引数は「名前、long型スコア、日付文字列」の順
+            Score s = new Score(name, ____, ____);
 
             // ★作成した Score を list に追加する
-            list.____(s);
+            list.add(s);
         }
     } catch (SQLException e) {
         e.printStackTrace();
@@ -604,7 +635,10 @@ public ArrayList<Score> select() {
 ScoreDAO dao = new ScoreDAO();
 
 // ★dao.select() の戻り値を拡張 for 文で1件ずつ取り出す
+for (Score s : dao.select()) {
 // ★取り出した Score を表示する
+    System.out.println(____);
+}
 ```
 
 ```text
@@ -626,17 +660,21 @@ SQLは `"INSERT INTO score (name, score, datetime) VALUES (?, ?, now())"` です
 public void insert(Score score) {
     String sql = "INSERT INTO score (name, score, datetime) VALUES (?, ?, now())";
 
-    try (Connection con = DriverManager.getConnection(____, ____, ____)) {
-        PreparedStatement ps = con.____(sql);
+    // ヒント：接続情報はフィールドの url, user, pass を使う
+    try (Connection con = DriverManager.getConnection(url, ____, ____)) {
+        // ★? つきのSQLを実行するので PreparedStatement を作る
+        PreparedStatement ps = con.prepareStatement(sql);
 
         // ★1つ目の ? には名前を入れる
+        // ヒント：Score から名前を取得する getter を使う
         ps.setString(1, score.____());
 
         // ★2つ目の ? には long 型のスコアを入れる
+        // ヒント：Score から long 型スコアを取得する getter を使う
         ps.setLong(2, score.____());
 
         // ★INSERT文を実行する
-        ps.____();
+        ps.executeUpdate();
     } catch (SQLException e) {
         e.printStackTrace();
     }
@@ -651,8 +689,15 @@ public void insert(Score score) {
 ScoreDAO dao = new ScoreDAO();
 
 // ★テスト用の Score を1件作る
+Score score = new Score("____", ____, "test");
+
 // ★insert メソッドでDBに登録する
+dao.insert(____);
+
 // ★select メソッドで登録後の一覧を表示する
+for (Score s : dao.select()) {
+    System.out.println(____);
+}
 ```
 
 既存のランキングに「シロー, 3時間25分45秒678, …」が追加されます。
@@ -674,17 +719,26 @@ ScoreDAO dao = new ScoreDAO();
 ```java
 // タイピング処理後…
 // ★時間計測を止める
+stopwatch.stop();
 
 // ★計測結果から Score を作る
+// ヒント：名前は入力済みの name、スコアは stopwatch から取得する
+Score score = new Score(____, stopwatch.getLongScore(), "now");
 
 // ★DB 登録
 // 1. ScoreDAO のインスタンスを作る
+ScoreDAO dao = new ScoreDAO();
 // 2. insert メソッドに、作成した Score を渡す
+dao.insert(____);
 
 // ★ランキング表示
 // 1. 見出しを表示する
+System.out.println("*** ランキング ***");
 // 2. select メソッドで一覧を取得する
 // 3. 拡張 for 文で1件ずつ表示する
+for (Score s : dao.select()) {
+    System.out.println(____);
+}
 ```
 
 ここでは「タイピング結果を表示する処理」と「DBに登録してランキングを表示する処理」を分けて考えると整理しやすいです。まずコンソールに結果が出ることを確認し、その後でDB登録、最後にランキング表示を足してください。
