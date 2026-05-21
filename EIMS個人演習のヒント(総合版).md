@@ -402,22 +402,18 @@ sw.start();
 
 ```java
 while (keywords.size() > 0) {
-    // ★残り問題数表示
-    System.out.println("あと " + questions.size() + "問");
+    // ★残り問題数を表示する
+    // ヒント：問題リストのサイズを使う
 
-    // ★先頭問題を表示
-    System.out.print(questions.get(0) + "> ");
-    String line = KB.readLine();
+    // ★先頭の問題を表示して、入力を1行受け取る
+    // ヒント：リストの0番目を使う
 
-    if (line.equals(keywords.get(0))) { // ★正解判定
-        // ★正解なら先頭削除
-        questions.remove(0);
+    if (/* 入力文字列と現在の問題が等しいか */) {
+        // ★正解なら、出題済みの先頭問題を削除する
 
-        // ★出題順をランダム化
-        Collections.shuffle(keywords);
+        // ★残り問題の出題順をランダム化する
     } else {
-        // ★不正解時のメッセージ
-        System.out.println("もう 1 回!");
+        // ★不正解時のメッセージを表示する
     }
 }
 ```
@@ -436,9 +432,11 @@ byte> byte
 ### 6. 時間計測終了＆結果を `Score` に記録。結果表示
 
 ```java
-sw.stop();
-Score s = new Score(name, stopwatch.getLongScore(), "now");
-System.out.println("終了！");
+// ★時間計測を止める
+
+// ★名前、計測結果、任意の日付文字列を使って Score を作る
+
+// ★終了メッセージと結果を表示する
 
 // ここに、結果を出力するコードを書いてください。
 ```
@@ -465,21 +463,21 @@ System.out.println("終了！");
 
 ```sql
 -- ① typinguser でログイン
-mysql -utypinguser -ppassword
+mysql -u____ -p____
 
 -- ② 使用 DB 指定
-USE typingdb;
+USE ____;
 
 -- ③ テーブル作成
 CREATE TABLE score (
-    no INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(20),
+    no INT __________ PRIMARY KEY,
+    name VARCHAR(__),
     score INT,
     datetime DATETIME
 );
 
 -- ④ 構造確認
-DESC score;
+DESC ____;
 exit;
 ```
 
@@ -499,7 +497,7 @@ exit;
 ```sql
 -- ① レコード追加（現在日時は NOW()）
 INSERT INTO score(name, score, datetime)
-VALUES('たろう', 123456, NOW());
+VALUES('____', ____, NOW());
 
 -- ② 登録確認
 SELECT * FROM score;
@@ -507,19 +505,21 @@ SELECT * FROM score;
 -- ③ ソート表示（スコア小→大）
 SELECT name, score, datetime
   FROM score
- ORDER BY score;
+ ORDER BY ____;
 
 -- ④ 名前の更新
 UPDATE score
-   SET name = '太郎'
- WHERE name = 'たろう';
+   SET name = '____'
+ WHERE name = '____';
 
 -- ⑤ レコード削除
 DELETE FROM score
- WHERE name = '太郎';
+ WHERE name = '____';
 
 exit;
 ```
+
+SQLは、先に `SELECT` で現在の状態を確認してから `UPDATE` や `DELETE` を実行すると安心です。特に `WHERE` 句は「どの行だけを対象にするか」を決める部分なので、空欄のままにせず、対象の名前を正確に入れてください。
 
 ### 注意点
 
@@ -541,8 +541,8 @@ exit;
 ```java
 public void connectTest() {
     // ★ここで DB に接続してからメッセージを出す
-    try (Connection con = DriverManager.getConnection(url, user, pass)) {
-        System.out.println("接続しました。");
+    try (Connection con = DriverManager.getConnection(____, ____, ____)) {
+        // ★接続できたことが分かるメッセージを表示する
     } catch (SQLException e) {
         e.printStackTrace(); // ★例外時は必ずスタックトレース
     }
@@ -567,18 +567,21 @@ public ArrayList<Score> select() {
     String sql = "SELECT name, score, datetime FROM score ORDER BY score";
     ArrayList<Score> list = new ArrayList<>(); // ★リストのインスタンスを予め宣言（空っぽのリスト生成）
 
-    try (Connection con = DriverManager.getConnection(url, user, pass);
-         Statement stmt = con.createStatement();
-         ResultSet rs = stmt.executeQuery(sql)) {
-        while (rs.next()) {
-            // ★ここで ResultSet から各列を取り出し
-            String name = rs.getString("name");
-            long sc = rs.getLong("score");
-            String dt = rs.getString("datetime");
+    try (Connection con = DriverManager.getConnection(____, ____, ____)) {
+        Statement stmt = con.____();
+        ResultSet rs = stmt.____(sql);
 
-            // ★DB から取得したデータを Score インスタンスを生成して記録しておく
-            Score s = new Score(name, sc, dt);
-            list.add(s); // データを詰めてリストに一行ずつ格納
+        while (rs.____()) {
+            // ★ResultSet から name, score, datetime を取り出す
+            String name = rs.getString("____");
+            long sc = rs.getLong("____");
+            String dt = rs.getString("____");
+
+            // ★取り出した3つの値で Score インスタンスを作る
+            Score s = new Score(____, ____, ____);
+
+            // ★作成した Score を list に追加する
+            list.____(s);
         }
     } catch (SQLException e) {
         e.printStackTrace();
@@ -588,13 +591,20 @@ public ArrayList<Score> select() {
 }
 ```
 
+迷ったときは、次の順で1行ずつ確認してください。
+
+1. SQL文だけを見て、取得する列名が `name`, `score`, `datetime` の3つだと確認する
+2. `ResultSet` から取り出す型を、`String`, `long`, `String` に分けて考える
+3. 取り出した値を `Score` のコンストラクタの引数順に並べる
+4. 最後に、作った `Score` を `ArrayList` に追加する
+
 ### 動作確認例（`Ex5_2` Main メソッド）
 
 ```java
 ScoreDAO dao = new ScoreDAO();
-for (Score s : dao.select()) {
-    System.out.println(s);
-}
+
+// ★dao.select() の戻り値を拡張 for 文で1件ずつ取り出す
+// ★取り出した Score を表示する
 ```
 
 ```text
@@ -616,26 +626,33 @@ SQLは `"INSERT INTO score (name, score, datetime) VALUES (?, ?, now())"` です
 public void insert(Score score) {
     String sql = "INSERT INTO score (name, score, datetime) VALUES (?, ?, now())";
 
-    try (Connection con = DriverManager.getConnection(url, user, pass);
-         PreparedStatement ps = con.prepareStatement(sql)) {
-        // ★ここでパラメータを設定
-        ps.setString(1, score.getName());
-        ps.setLong(2, score.getLongScore());
-        ps.executeUpdate();
+    try (Connection con = DriverManager.getConnection(____, ____, ____)) {
+        PreparedStatement ps = con.____(sql);
+
+        // ★1つ目の ? には名前を入れる
+        ps.setString(1, score.____());
+
+        // ★2つ目の ? には long 型のスコアを入れる
+        ps.setLong(2, score.____());
+
+        // ★INSERT文を実行する
+        ps.____();
     } catch (SQLException e) {
         e.printStackTrace();
     }
 }
 ```
 
+`?` の順番と `setXxx` の番号は対応しています。1番目の `?` が名前、2番目の `?` がスコアです。`datetime` はSQLの `now()` が入れるため、Javaから値を渡す必要はありません。
+
 ### 動作確認例（`Ex5_3`）
 
 ```java
 ScoreDAO dao = new ScoreDAO();
-dao.insert(new Score("シロー", 12345678, "テスト"));
-for (Score s : dao.select()) {
-    System.out.println(s);
-}
+
+// ★テスト用の Score を1件作る
+// ★insert メソッドでDBに登録する
+// ★select メソッドで登録後の一覧を表示する
 ```
 
 既存のランキングに「シロー, 3時間25分45秒678, …」が追加されます。
@@ -656,19 +673,21 @@ for (Score s : dao.select()) {
 
 ```java
 // タイピング処理後…
-stopwatch.stop();
-Score score = new Score(name, stopwatch.getLongScore(), "now");
+// ★時間計測を止める
+
+// ★計測結果から Score を作る
 
 // ★DB 登録
-ScoreDAO dao = new ScoreDAO();
-dao.insert(score);
+// 1. ScoreDAO のインスタンスを作る
+// 2. insert メソッドに、作成した Score を渡す
 
 // ★ランキング表示
-System.out.println("*** ランキング ***");
-for (Score s : dao.select()) {
-    System.out.println(s);
-}
+// 1. 見出しを表示する
+// 2. select メソッドで一覧を取得する
+// 3. 拡張 for 文で1件ずつ表示する
 ```
+
+ここでは「タイピング結果を表示する処理」と「DBに登録してランキングを表示する処理」を分けて考えると整理しやすいです。まずコンソールに結果が出ることを確認し、その後でDB登録、最後にランキング表示を足してください。
 
 実行例:
 
