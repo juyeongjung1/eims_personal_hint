@@ -1,0 +1,630 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EIMS個人演習のヒント（総合版）</title>
+<style>
+:root {
+  --bg: #f7f8f5;
+  --paper: #ffffff;
+  --ink: #1d2528;
+  --muted: #5b676c;
+  --line: #d9dfdc;
+  --green: #1f7a62;
+  --green-soft: #e6f3ee;
+  --amber: #946200;
+  --amber-soft: #fff3d6;
+  --code: #101820;
+  --blue: #2f5f9e;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: "Yu Gothic UI", "Meiryo", system-ui, sans-serif;
+  line-height: 1.78;
+}
+.progress { position: fixed; inset: 0 auto auto 0; height: 4px; width: 0; background: var(--green); z-index: 5; }
+.layout { display: grid; grid-template-columns: 280px minmax(0, 1fr); min-height: 100vh; }
+.sidebar {
+  position: sticky; top: 0; height: 100vh; overflow: auto;
+  padding: 24px 18px; border-right: 1px solid var(--line); background: #fbfcfa;
+}
+.brand { font-weight: 700; font-size: 15px; margin-bottom: 16px; color: var(--green); }
+.search {
+  width: 100%; height: 40px; border: 1px solid var(--line); border-radius: 6px;
+  padding: 0 10px; background: white; font-size: 14px;
+}
+nav { display: grid; gap: 4px; margin-top: 18px; }
+nav a {
+  color: var(--ink); text-decoration: none; padding: 8px 10px; border-radius: 6px;
+  font-size: 14px; line-height: 1.35;
+}
+nav a:hover, nav a.active { background: var(--green-soft); color: var(--green); }
+main { max-width: 1040px; width: 100%; padding: 40px 42px 80px; }
+.doc-hero {
+  padding: 20px 0 30px; border-bottom: 2px solid var(--line); margin-bottom: 26px;
+}
+.kicker { color: var(--green); font-weight: 700; margin: 0 0 8px; }
+h1 { font-size: 34px; line-height: 1.25; margin: 0 0 12px; }
+h2 {
+  font-size: 25px; line-height: 1.35; margin: 0 0 22px; padding-bottom: 10px;
+  border-bottom: 1px solid var(--line);
+}
+h3 { font-size: 18px; margin: 26px 0 8px; color: #243235; }
+p { margin: 10px 0; }
+.exercise {
+  background: var(--paper); border: 1px solid var(--line); border-radius: 8px;
+  padding: 28px; margin: 22px 0; box-shadow: 0 1px 2px rgba(20, 30, 28, 0.04);
+}
+.reference {
+  border-left: 5px solid var(--green); background: var(--green-soft);
+  padding: 12px 14px; margin: 14px 0; border-radius: 0 6px 6px 0; font-weight: 700;
+}
+.lead-label { font-weight: 700; color: var(--green); margin-top: 18px; }
+ul, ol { padding-left: 1.4rem; }
+li { margin: 5px 0; }
+code { background: #eef2f1; padding: 0.1em 0.35em; border-radius: 4px; font-family: Consolas, "Courier New", monospace; }
+.code-shell { background: var(--code); color: #edf7f5; border-radius: 8px; overflow: hidden; margin: 16px 0; }
+.code-toolbar { display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: #17242d; color: #b9c9c7; font-size: 12px; }
+.code-toolbar button { border: 1px solid #48606b; background: #22333d; color: white; border-radius: 5px; padding: 4px 8px; cursor: pointer; }
+pre { margin: 0; padding: 16px; overflow: auto; font-family: Consolas, "Courier New", monospace; font-size: 14px; line-height: 1.6; }
+.blank { background: var(--amber-soft); color: #2b1b00; border: 1px solid #e3bd66; border-radius: 4px; padding: 0 3px; font-weight: 700; }
+.table-wrap { overflow: auto; margin: 16px 0; border: 1px solid var(--line); border-radius: 8px; }
+table { width: 100%; border-collapse: collapse; background: white; font-size: 14px; }
+th, td { border-bottom: 1px solid var(--line); padding: 10px 12px; vertical-align: top; }
+th { background: #eef4f1; text-align: left; color: #243235; }
+figure { margin: 18px 0; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; background: #fdfefe; }
+figure img { display: block; width: 100%; height: auto; }
+figcaption { font-size: 13px; color: var(--muted); padding: 8px 12px; border-top: 1px solid var(--line); }
+.no-results { display: none; padding: 18px; background: var(--amber-soft); color: var(--amber); border-radius: 8px; }
+.exercise.hidden { display: none; }
+@media (max-width: 860px) {
+  .layout { grid-template-columns: 1fr; }
+  .sidebar { position: static; height: auto; border-right: 0; border-bottom: 1px solid var(--line); }
+  main { padding: 24px 16px 60px; }
+  .exercise { padding: 20px 16px; }
+  h1 { font-size: 27px; }
+}
+</style>
+</head>
+<body>
+<div class="progress" id="progress"></div>
+<div class="layout">
+<aside class="sidebar">
+  <div class="brand">EIMS 個人演習のヒント</div>
+  <input class="search" id="search" type="search" placeholder="演習・用語を検索">
+  <nav id="toc"><a href="#演習1.1-のヒント">演習1.1 のヒント</a>
+<a href="#演習1.2-のヒント">演習1.2 のヒント</a>
+<a href="#演習2.1-のヒント">演習2.1 のヒント</a>
+<a href="#演習2.2-のヒント">演習2.2 のヒント</a>
+<a href="#演習2.3-のヒント">演習2.3 のヒント</a>
+<a href="#演習3.1-のヒント">演習3.1 のヒント</a>
+<a href="#演習3.2-のヒント">演習3.2 のヒント</a>
+<a href="#演習3.3-のヒント">演習3.3 のヒント</a>
+<a href="#演習4.1-のヒント">演習4.1 のヒント</a>
+<a href="#演習4.2-のヒント">演習4.2 のヒント</a>
+<a href="#演習4.3-のヒント">演習4.3 のヒント</a>
+<a href="#演習5.1-のヒント">演習5.1 のヒント</a>
+<a href="#演習5.2-のヒント">演習5.2 のヒント</a>
+<a href="#演習5.3-のヒント">演習5.3 のヒント</a>
+<a href="#演習5.4-のヒント">演習5.4 のヒント</a></nav>
+</aside>
+<main>
+<header class="doc-hero"><p class="kicker">EIMS 個人演習</p><h1>EIMS個人演習のヒント（総合版）</h1><p>ヒントを演習ごとに整理し、参照テキスト・コード・画像を読みやすくまとめたHTML版です。</p></header>
+<section class="exercise" id="演習1.1-のヒント" data-title="演習1.1 のヒント"><h2>演習1.1 のヒント</h2>
+<h3>仕様確認</h3>
+<p>「5つの問題を格納する配列を作成し…」という部分を仕様書で再度確認してください。</p>
+<aside class="reference">※「Java によるデータ構造とアルゴリズム」 154～159ページ を参照してください。</aside>
+<h3>配列の宣言・初期化</h3>
+<div class="code-shell" data-lang="java"><div class="code-toolbar"><span>java</span><button type="button">コピー</button></div><pre><code>String[] keywords = { &quot;class&quot;, &quot;int&quot;, &quot;boolean&quot;, &quot;if&quot;, &quot;while&quot; };</code></pre></div>
+<p>この記述方法が分かりにくい場合は、<code>String[]</code>（型）と変数名、<code>{}</code> 内に要素をカンマで区切って並べるルールを理解してください。</p>
+<h3>要素数の取得</h3>
+<p><code>keywords.length</code> と記述する際につまずきやすいです。<code>length()</code> メソッドではなくプロパティである点に留意してください。</p>
+<h3>拡張 for 文</h3>
+<div class="code-shell" data-lang="java"><div class="code-toolbar"><span>java</span><button type="button">コピー</button></div><pre><code>for (String word : keywords) {
+    System.out.println(word);
+}</code></pre></div>
+<p>構文は「型 変数名 : 配列名」の順序で書きます。ループごとに配列の先頭から順に要素が取り出される仕組みをイメージすると理解しやすいです。</p>
+</section>
+<section class="exercise" id="演習1.2-のヒント" data-title="演習1.2 のヒント"><h2>演習1.2 のヒント</h2>
+<h3>仕様確認</h3>
+<p>「ミリ秒のスコアを…『○時間×分△秒□□□』という形式の文字列に変換」とあることを再確認してください。</p>
+<aside class="reference">※「アルゴリズム演習」 演習1.3 の問題と似ています。</aside>
+<h3>1. <code>getStringScore</code> で変換しないといけない理由</h3>
+<p>ミリ秒（ms）だけの大きな数値をそのまま表示しても、何時間何分何秒なのかイメージしづらいですよね。</p>
+<p>そこで「時間」「分」「秒」「ミリ秒」の4つの単位に分解し、読みやすい文字列に変換するのが目的です。</p>
+<h3>2. 「余り」と「商」を分ける理由</h3>
+<p>プログラムでは「余りを取ると小さい単位が得られ、商を取ると大きい単位に切り替わる」という法則を使います。</p>
+<ul><li>余り（<code>%</code>）: 小さい単位だけを取り出す</li><li>商（<code>/</code>）: 大きい単位にまとめる</li></ul>
+<p>このルールに従い、段階的に計算します。</p>
+<h3>3. 各変数の役割と“なぜここに代入するのか”</h3>
+<div class="code-shell" data-lang="java"><div class="code-toolbar"><span>java</span><button type="button">コピー</button></div><pre><code>long msec = score % 1000;       // ①：1000で割った余り → “ミリ秒だけ”を取り出す
+long secScore = score / 1000;   // ②：ミリ秒分を除外した秒の値を取っておく
+long sec = secScore % 60;       // ③：60で割った余り → “1分未満の秒”を取り出す
+long minScore = secScore / 60;  // ④：全体を分に変換 → “秒”という単位をまとめる
+long min = minScore % 60;       // ⑤：60で割った余り → “1時間未満の分”を取り出す
+long hour = minScore / 60;      // ⑥：残った商 → “時間”を取得
+
+// 以降、hour/min/sec/msec を組み合わせて文字列を作る</code></pre></div>
+<p class="lead-label">①で <code>msec</code> に入れておく理由:</p>
+<ul><li><code>score % 1000</code> を直接次の行で使うと式が長く、何をしているか分かりづらい。</li><li>一時変数 <code>msec</code> に名前を付けることで「これはミリ秒部分ですよ」と明示できる。</li></ul>
+<p class="lead-label">②で <code>secScore</code> に入れておく理由:</p>
+<ul><li>以降の「秒→分」「分→時間」の計算に何度も使うため、一度まとめておく。</li><li>もし <code>score / 1000</code> を毎回書いたらミスや読み間違いの原因になります。</li></ul>
+<p class="lead-label">③～⑥の流れ:</p>
+<ul><li><code>secScore % 60</code>: 1分未満の「残り秒」を得る</li><li><code>secScore / 60</code>: 全体の「何分か」を得て、さらにそれを60で割り分ける</li><li>それぞれ別の変数に代入することで、「ここでは秒を、次では分を…」と段階を追って確認できる</li></ul>
+<p><code>12345678</code> ミリ秒は、3時間25分45秒678です。</p>
+<div class="table-wrap"><table><thead><tr><th>変数名</th><th>計算式</th><th>値</th><th>解説</th></tr></thead><tbody><tr><td><code>msec</code></td><td><code>score % 1000</code></td><td>678</td><td>1000で割った余り → 「ミリ秒部分」だけ取り出す</td></tr><tr><td><code>secScore</code></td><td><code>score / 1000</code></td><td>12345</td><td>3時間25分45秒分を、秒の単位で取っておく</td></tr><tr><td><code>sec</code></td><td><code>secScore % 60</code></td><td>45</td><td>60で割った余り → 「1分未満の秒」だけ取り出す</td></tr><tr><td><code>minScore</code></td><td><code>secScore / 60</code></td><td>205</td><td>残った3時間25分を、分単位で取っておく</td></tr><tr><td><code>min</code></td><td><code>minScore % 60</code></td><td>25</td><td>60で割った余り → 「1時間未満の分」だけ取り出す</td></tr><tr><td><code>hour</code></td><td><code>minScore / 60</code></td><td>3</td><td>残った3時間を、時間単位で取っておく</td></tr></tbody></table></div>
+<h3>4. 文字列出力の条件文</h3>
+<p>上記の仕様を実現するためには、変換が終わったからと言って、そのまま出力してはいけません。出力する際に、条件文を使ってください。</p>
+<p>たとえば <code>score = 123456</code>（約2分）を変換すると、次のようになります。</p>
+<ul><li><code>hour = 0</code> → 「0時間」は不要</li><li><code>min = 2</code> → 「2分」だけは表示したい</li></ul>
+<p>もし、<code>if (hour &gt; 0)</code> の条件がないと、「0時間2分…」となってしまいます。</p>
+<div class="code-shell" data-lang="text"><div class="code-toolbar"><span>text</span><button type="button">コピー</button></div><pre><code>12345678 ミリ秒は、3時間25分45秒678
+1234567 ミリ秒は、20分34秒567      ← hour=0 ⇒ 「時間」部分をスキップ
+123456 ミリ秒は、2分3秒456          ← hour=0, secScore=123 ⇒ 「秒」も残る
+12345 ミリ秒は、12秒345             ← hour=0, min=0 ⇒ 「分」をスキップ</code></pre></div>
+<figure><img src="./assets/eims-hints/page-04.png" alt="演習1.2 文字列出力の条件文とMainメソッド" loading="lazy"><figcaption>演習1.2 文字列出力の条件文とMainメソッド</figcaption></figure>
+<h3>文字列の組み立て</h3>
+<div class="code-shell" data-lang="java"><div class="code-toolbar"><span>java</span><button type="button">コピー</button></div><pre><code>if (hour &gt; 0) {
+    strScore = hour + &quot;時間&quot;;
+}</code></pre></div>
+<p>など、「～～が0より大きい場合のみ追加する」条件分岐を、単位ごと用意して出力してください。</p>
+<h3>5. Main メソッドですること</h3>
+<p>繰り返しを用いる理由は、出力の条件文がちゃんと実装できたのかを確認するためです。</p>
+<p><code>12345678</code> ミリ秒を、どんどん10で割っていくと、小さい単位までテストできます。</p>
+<div class="code-shell" data-lang="java"><div class="code-toolbar"><span>java</span><button type="button">コピー</button></div><pre><code>for (int i = 0; i &lt; 4; i++) {
+    System.out.println(score + &quot;ミリ秒は、&quot; + getStringScore(score));
+    score /= 10;
+}</code></pre></div>
+<figure><img src="./assets/eims-hints/page-04.png" alt="演習1.2 Mainメソッドですること" loading="lazy"><figcaption>演習1.2 Mainメソッドですること</figcaption></figure>
+</section>
+<section class="exercise" id="演習2.1-のヒント" data-title="演習2.1 のヒント"><h2>演習2.1 のヒント</h2>
+<h3>仕様のポイント</h3>
+<p>配列の各要素と比較対象文字列が等しいかチェックするロジックを実装します。</p>
+<aside class="reference">※「Java によるオブジェクト指向プログラミング」 105～107ページ を参照してください。</aside>
+<h3>文字列比較の注意点</h3>
+<p><code>==</code> ではなく <code>equals()</code> メソッドで中身を比較しないと、常に「等しくない」と判定されてしまいます。</p>
+<div class="code-shell" data-lang="java"><div class="code-toolbar"><span>java</span><button type="button">コピー</button></div><pre><code>for (String word : keywords) {
+    System.out.print(input + &quot; と &quot; + word + &quot; は、&quot;);
+    // ★ここがポイント：&#x27;==&#x27; ではなく equals() で中身を比較
+    if (input.equals(word)) {
+        System.out.println(&quot;等しいです&quot;);
+    } else {
+        System.out.println(&quot;等しくないです&quot;);
+    }
+}</code></pre></div>
+<aside class="reference">※ <code>String[] keywords = { &quot;class&quot;, &quot;int&quot;, &quot;boolean&quot;, &quot;if&quot;, &quot;while&quot; };</code> と <code>String input = &quot;boolean&quot;;</code> は事前に宣言します。</aside>
+<h3>出力例との比較</h3>
+<p>配列の長さを <code>array.length</code> で取得し、実行例の「5個の問題があります」という表示と比較結果のフォーマット（<code>boolean と class は等しくないです</code> など）が合っているか確認してください。</p>
+</section>
+<section class="exercise" id="演習2.2-のヒント" data-title="演習2.2 のヒント"><h2>演習2.2 のヒント</h2>
+<h3>仕様のポイント</h3>
+<p>以下の仕様通りに実装することが大事です。</p>
+<p>コンストラクタの引数は3つなのに、フィールドは4つありますよね。</p>
+<p>コンストラクタの引数を、そのままフィールドに代入して初期化する、今までの常識を変える必要があります。4つ目の <code>String score</code> に、何を入れるべきでしょうか。</p>
+<aside class="reference">※「Java によるオブジェクト指向プログラミング」 38～41ページ を参照してください。</aside>
+<figure><img src="./assets/eims-hints/page-06.png" alt="演習2.2 Scoreクラス仕様" loading="lazy"><figcaption>演習2.2 Scoreクラス仕様</figcaption></figure>
+<h3>コンストラクタ実装</h3>
+<div class="code-shell" data-lang="java"><div class="code-toolbar"><span>java</span><button type="button">コピー</button></div><pre><code>public Score(String name, long longScore, String date) {
+    this.name      = name;
+    this.longScore = longScore;
+    this.date      = date;
+    // ★ここで long → String に変換して score フィールドにセット
+    this.score     = getStringScore(longScore);
+}</code></pre></div>
+<p>演習1.2で作成した、<code>getStringScore(longScore)</code> をコピーして、そのまま使いましょう。</p>
+<p><code>score</code> フィールドは、<code>〇時間〇分〇秒〇〇〇</code> という文字列を入れるためのフィールドです。コンストラクタの引数として受け取る値は <code>long</code> 型の数字ですが、コンストラクタの中で <code>getStringScore(longScore)</code> を呼び出す処理をすると、<code>long</code> の数字が演習1.2のように変換され、戻り値として取得されます。</p>
+<p>その戻り値を <code>score</code> フィールドに代入しておくと、出力用の文字列の値をセットできます。</p>
+<h3>getter メソッド</h3>
+<p><code>getName()</code>, <code>getLongScore()</code>, <code>getDate()</code>, <code>getScore()</code> は戻り値の型とフィールドを対応させて正しく返すこと。</p>
+<p>戻り値を間違えるとテストクラス <code>Ex2_2</code> が期待する出力とずれます。</p>
+<h3><code>toString</code> の実装</h3>
+<aside class="reference">※「Java によるオブジェクト指向プログラミング」 38～41ページ を参照してください。</aside>
+<p>実行例のように出力するために、一番簡単な方法が <code>toString</code> メソッドを再定義することです。</p>
+<div class="code-shell" data-lang="text"><div class="code-toolbar"><span>text</span><button type="button">コピー</button></div><pre><code>世界太郎, 2分3秒456, 2020/01/01 12:34:56</code></pre></div>
+<div class="code-shell" data-lang="java"><div class="code-toolbar"><span>java</span><button type="button">コピー</button></div><pre><code>@Override
+public String toString() {
+    // ★カンマと空白の位置を実行例と同じに
+    return name + &quot;, &quot; + score + &quot;, &quot; + date;
+}</code></pre></div>
+<p>実行例の出力になるように、「<code>,</code>」と文字列を <code>+</code> でうまく設定しておけば、Main メソッドで <code>System.out.println(score);</code> をするだけで、実行例のような出力ができます。</p>
+</section>
+<section class="exercise" id="演習2.3-のヒント" data-title="演習2.3 のヒント"><h2>演習2.3 のヒント</h2>
+<h3>仕様のポイント</h3>
+<p><code>Stopwatch</code> クラスは <code>start()</code>, <code>stop()</code>, <code>getLongScore()</code> の3メソッドで処理時間を計測します。</p>
+<p>現在時刻をミリ秒で取得するメソッドをAPIから調べることが大事です。</p>
+<aside class="reference">※「Java によるオブジェクト指向プログラミング」 98～102ページ を参照してください。</aside>
+<h3>1. Java API をブラウザで検索し、APIサイトに接続</h3>
+<figure><img src="./assets/eims-hints/page-08.png" alt="Java API検索結果" loading="lazy"><figcaption>Java API検索結果</figcaption></figure>
+<h3>2. 右上の検索バーに、調べたいクラス（今回は <code>System</code>）を検索し、クリックする</h3>
+<figure><img src="./assets/eims-hints/page-08.png" alt="Systemクラスの検索" loading="lazy"><figcaption>Systemクラスの検索</figcaption></figure>
+<figure><img src="./assets/eims-hints/page-08.png" alt="Systemクラス検索候補" loading="lazy"><figcaption>Systemクラス検索候補</figcaption></figure>
+<h3>3. メソッドの概要を探せば、すぐ見つかる</h3>
+<p>ブラウザの翻訳Onを推奨します。</p>
+<figure><img src="./assets/eims-hints/page-09.png" alt="currentTimeMillisメソッド" loading="lazy"><figcaption>currentTimeMillisメソッド</figcaption></figure>
+<p><code>static</code> が付いているので、呼び出す時は、<code>System.currentTimeMillis();</code> と呼び出さないといけないこともわかります。</p>
+<p>あとは、仕様通りに、<code>Stopwatch</code> クラスを定義しましょう。</p>
+<h3>時刻取得メソッド</h3>
+<div class="code-shell" data-lang="java"><div class="code-toolbar"><span>java</span><button type="button">コピー</button></div><pre><code>public void start() {
+    // ★開始時刻をミリ秒で取得
+    start = System.currentTimeMillis();
+}
+
+public void stop() {
+    // ★終了時刻をミリ秒で取得
+    end = System.currentTimeMillis();
+}</code></pre></div>
+<h3>経過時間の計算</h3>
+<div class="code-shell" data-lang="java"><div class="code-toolbar"><span>java</span><button type="button">コピー</button></div><pre><code>public long getLongScore() {
+    // ★end - start の符号ミスに注意
+    return end - start;
+}</code></pre></div>
+<p><code>end - start</code> の差分を <code>long</code> 型で返す <code>getLongScore()</code> の実装が重要です。符号ミスや型キャストに注意してください。</p>
+<aside class="reference">※テストクラスでは <code>start()</code> → 処理 → <code>stop()</code> → <code>getLongScore()</code> の順で呼ぶことを想定しています。</aside>
+<h3>動作確認のコツ</h3>
+<p><code>Ex2_3</code> の <code>main</code> で「0～999を出力するのに何ミリ秒かかったか」を測定します。</p>
+<ol><li><code>start</code> メソッドを実行</li><li><code>for</code> 文で0～1000回繰り返し数字を出力</li><li><code>end</code> メソッドを実行</li><li><code>getLongScore()</code> を実行すれば、2でかかったミリ秒を取得できるので、出力します。</li></ol>
+<p>ループを止める場所や <code>stop()</code> を呼ぶタイミングを見落とさないようにして、出力例と同じフォーマットになっているか確かめてください。</p>
+</section>
+<section class="exercise" id="演習3.1-のヒント" data-title="演習3.1 のヒント"><h2>演習3.1 のヒント</h2>
+<h3>仕様のポイント</h3>
+<p>キーボードから文字を入力してもらい、<code>return</code> する <code>KB</code> クラスの <code>readLine()</code> メソッドを定義します。</p>
+<p><code>BufferedReader</code> + <code>InputStreamReader(System.in)</code> や、<code>Scanner</code> で標準入力を1行読んで返します。</p>
+<aside class="reference">※「Java システムプログラミング」 42～49ページ を参照してください。</aside>
+<p>例外処理をしないとエラーになるので、<code>try-catch</code> で例外処理をしてください。</p>
+<h3>入力受付ループの注意点</h3>
+<div class="code-shell" data-lang="java"><div class="code-toolbar"><span>java</span><button type="button">コピー</button></div><pre><code>while (true) {
+    System.out.print(&quot;何か入力(exitで終了)&gt; &quot;); // 入力を促す文字列
+    String input = KB.readLine();
+    // ★&quot;exit&quot; と比較するときは equals() を使う
+    if (&quot;exit&quot;.equals(input)) {
+        break;
+    }
+    System.out.println(input);
+}</code></pre></div>
+</section>
+<section class="exercise" id="演習3.2-のヒント" data-title="演習3.2 のヒント"><h2>演習3.2 のヒント</h2>
+<h3>仕様のポイント</h3>
+<p>事前に <code>keywords.txt</code> を Eclipse のプロジェクト内に格納してください。</p>
+<aside class="reference">※「Java システムプログラミング」 28～29ページ を参照してください。</aside>
+<p><code>TypingFile.read(String filename)</code> はクラスメソッドとして定義し、引数で渡されたファイル名のテキストを1行ずつ <code>ArrayList&lt;String&gt;</code> に追加して返します。</p>
+<p><code>ArrayList</code> に格納する理由は、入力を複数してもらうので、複数のデータを格納する必要があるからです。</p>
+<h3><code>TypingFile.java</code> の要点抜粋</h3>
+<div class="code-shell" data-lang="java"><div class="code-toolbar"><span>java</span><button type="button">コピー</button></div><pre><code>public static ArrayList&lt;String&gt; read(String filename) {
+    ArrayList&lt;String&gt; list = new ArrayList&lt;&gt;();
+    // ★try-with-resources で自動クローズ
+    try (BufferedReader br = new BufferedReader(new FileReader(filename))) {
+        String line;
+
+        // この部分に以下のコードを書きましょう。
+        // 1. 1行ずつ読んで null までループする。
+        // 2. 読んだ文字列は list.add(line) しておくコード
+    }
+
+    return list;
+}</code></pre></div>
+<p>例外処理は <code>try-with-resources</code> と <code>e.printStackTrace()</code> を使い、必ずリソースを解放するようにします。</p>
+<h3>動作確認例（<code>Ex3_2</code> の <code>main</code> 内）</h3>
+<p><code>keywords.txt</code> は、Eclipseプロジェクト内の一番上位に配置しないといけません。誤字に気を付けてください。</p>
+<div class="code-shell" data-lang="java"><div class="code-toolbar"><span>java</span><button type="button">コピー</button></div><pre><code>ArrayList&lt;String&gt; data = TypingFile.read(&quot;keywords.txt&quot;);
+for (String s : data) {
+    System.out.println(s); // ★ファイルの各行が順に表示されるか確認
+}</code></pre></div>
+<p><code>static</code> クラスメソッドを呼び出すので、クラス名.メソッド名で呼び出します。</p>
+</section>
+<section class="exercise" id="演習3.3-のヒント" data-title="演習3.3 のヒント"><h2>演習3.3 のヒント</h2>
+<h3>仕様のポイント</h3>
+<p><code>Typing</code> クラスの <code>main()</code> では、以下の順序で各クラスを組み合わせます。</p>
+<h3>1. 問題読み込み</h3>
+<div class="code-shell" data-lang="java"><div class="code-toolbar"><span>java</span><button type="button">コピー</button></div><pre><code>ArrayList&lt;String&gt; keywords = TypingFile.read(&quot;keywords.txt&quot;);</code></pre></div>
+<h3>2. 名前入力</h3>
+<div class="code-shell" data-lang="java"><div class="code-toolbar"><span>java</span><button type="button">コピー</button></div><pre><code>System.out.print(&quot;名前を入力&gt; &quot;);
+String name = KB.readLine();</code></pre></div>
+<h3>3. 練習開始待ち</h3>
+<div class="code-shell" data-lang="java"><div class="code-toolbar"><span>java</span><button type="button">コピー</button></div><pre><code>System.out.print(&quot;何かキーを押してください（タイピング練習開始）&gt; &quot;);
+KB.readLine(); // ★何でも良いので1行読み込む</code></pre></div>
+<h3>4. 時間計測開始</h3>
+<div class="code-shell" data-lang="java"><div class="code-toolbar"><span>java</span><button type="button">コピー</button></div><pre><code>Stopwatch sw = new Stopwatch();
+sw.start();</code></pre></div>
+<h3>5. 問題ループ</h3>
+<div class="code-shell" data-lang="java"><div class="code-toolbar"><span>java</span><button type="button">コピー</button></div><pre><code>while (keywords.size() &gt; 0) {
+    // ★残り問題数を表示する
+    // ヒント：keywords.size() を文字列とつなげる
+    System.out.println(&quot;あと&quot; + keywords.<span class="blank">____</span>() + &quot;問&quot;);
+
+    // ★先頭の問題を表示して、入力を1行受け取る
+    // ヒント：リストの0番目は keywords.get(0)
+    System.out.print(keywords.<span class="blank">____</span>(0) + &quot;&gt; &quot;);
+    String line = KB.readLine();
+
+    // ★文字列の比較なので == ではなく equals を使う
+    // ヒント：line と keywords.get(0) を比較する
+    if (line.equals(<span class="blank">____</span>)) {
+        // ★正解なら、出題済みの先頭問題を削除する
+        keywords.remove(<span class="blank">____</span>);
+
+        // ★残り問題の出題順をランダム化する
+        Collections.shuffle(<span class="blank">____</span>);
+    } else {
+        // ★不正解時のメッセージを表示する
+        System.out.println(&quot;<span class="blank">____</span>&quot;);
+    }
+}</code></pre></div>
+<p>ここでは、変数名が混ざりやすいです。問題リストは <code>keywords</code>、入力された文字列は <code>line</code> と考えると整理しやすくなります。</p>
+<p class="lead-label">実行例:</p>
+<div class="code-shell" data-lang="text"><div class="code-toolbar"><span>text</span><button type="button">コピー</button></div><pre><code>...
+...
+あと 1問
+byte&gt; byte
+終了！
+世界太郎さんの結果：15秒948</code></pre></div>
+<h3>6. 時間計測終了＆結果を <code>Score</code> に記録。結果表示</h3>
+<div class="code-shell" data-lang="java"><div class="code-toolbar"><span>java</span><button type="button">コピー</button></div><pre><code>// ★時間計測を止める
+sw.stop();
+
+// ★名前、計測結果、任意の日付文字列を使って Score を作る
+// ヒント：new Score(名前, long型のスコア, 任意の文字列)
+Score s = new Score(<span class="blank">____</span>, sw.getLongScore(), &quot;now&quot;);
+
+// ★終了メッセージと結果を表示する
+System.out.println(&quot;終了！&quot;);
+System.out.println(name + &quot;さんの結果：&quot; + s.<span class="blank">____</span>());
+
+// ここに、結果を出力するコードを書いてください。</code></pre></div>
+<p>この問題の実行例では、時間まで出力しなくても良いので、コンストラクタの第3引数には、任意の文字列を入れておけばOKです。</p>
+</section>
+<section class="exercise" id="演習4.1-のヒント" data-title="演習4.1 のヒント"><h2>演習4.1 のヒント</h2>
+<h3>仕様のポイント</h3>
+<p><code>root</code> ユーザで MySQL に接続し、データベースとアプリ用ユーザを作成します。</p>
+<h3>注意点</h3>
+<ul><li><code>-p</code> オプション直後にパスワードが続く書式を守る</li><li>SQL文は必ずセミコロン（<code>;</code>）で終了する</li><li>エラーが出た際は、妥協せず正しくもう一回入力すること</li></ul>
+</section>
+<section class="exercise" id="演習4.2-のヒント" data-title="演習4.2 のヒント"><h2>演習4.2 のヒント</h2>
+<h3>仕様のポイント</h3>
+<p><code>typinguser</code> で接続し、<code>score</code> テーブルを自動採番付き主キーで作成します。</p>
+<div class="code-shell" data-lang="sql"><div class="code-toolbar"><span>sql</span><button type="button">コピー</button></div><pre><code>-- ① typinguser でログイン
+mysql -utypinguser -ppassword
+
+-- ② 使用 DB 指定
+USE typingdb;
+
+-- ③ テーブル作成
+CREATE TABLE score (
+    no INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(20),
+    score INT,
+    datetime DATETIME
+);
+
+-- ④ 構造確認
+DESC score;
+exit;</code></pre></div>
+<h3>注意点</h3>
+<ul><li><code>AUTO_INCREMENT</code> を指定しないと主キーは自動採番されない</li><li><code>VARCHAR(20)</code> の文字数制限を超えないよう注意</li></ul>
+</section>
+<section class="exercise" id="演習4.3-のヒント" data-title="演習4.3 のヒント"><h2>演習4.3 のヒント</h2>
+<h3>仕様のポイント</h3>
+<p><code>INSERT</code> → <code>SELECT</code> → <code>UPDATE</code> → <code>DELETE</code> と順に操作を行い、結果を確認します。</p>
+<aside class="reference">※「データベース入門」の2章を参照してください。</aside>
+<div class="code-shell" data-lang="sql"><div class="code-toolbar"><span>sql</span><button type="button">コピー</button></div><pre><code>-- ① レコード追加（現在日時は NOW()）
+INSERT INTO score(name, score, datetime)
+VALUES(&#x27;たろう&#x27;, 123456, NOW());
+
+-- ② 登録確認
+SELECT * FROM score;
+
+-- ③ ソート表示（スコア小→大）
+SELECT name, score, datetime
+  FROM score
+ ORDER BY score;
+
+-- ④ 名前の更新
+UPDATE score
+   SET name = &#x27;太郎&#x27;
+ WHERE name = &#x27;たろう&#x27;;
+
+-- ⑤ レコード削除
+DELETE FROM score
+ WHERE name = &#x27;太郎&#x27;;
+
+exit;</code></pre></div>
+<p>SQLは、先に <code>SELECT</code> で現在の状態を確認してから <code>UPDATE</code> や <code>DELETE</code> を実行すると安心です。特に <code>WHERE</code> 句は「どの行だけを対象にするか」を決める部分なので、対象の名前を正確に確認してください。</p>
+<h3>注意点</h3>
+<ul><li><code>NOW()</code> は MySQL の現在日時関数</li><li><code>WHERE</code> 条件を誤ると大量削除・更新になるため慎重に指定</li><li><code>SELECT *</code> は簡易確認用。実務では必要なカラムのみ指定すると可読性向上</li></ul>
+</section>
+<section class="exercise" id="演習5.1-のヒント" data-title="演習5.1 のヒント"><h2>演習5.1 のヒント</h2>
+<h3>仕様のポイント</h3>
+<ul><li>MySQL Connector を必ずビルドパスに登録しておくこと</li><li><code>ScoreDAO</code> クラスのフィールドに JDBC の接続情報を持たせる（<code>url</code>, <code>user</code>, <code>pass</code>）</li><li>問題文で提示している接続情報に誤字がないか、しっかり確認してください</li><li><code>connectTest()</code> は <code>DriverManager.getConnection(...)</code> で接続し、「接続しました。」を出力、必ず切断する（<code>try-with-resources</code>）</li></ul>
+<aside class="reference">※「Java データベースプログラミング」 35ページ を参照してください。</aside>
+<div class="code-shell" data-lang="java"><div class="code-toolbar"><span>java</span><button type="button">コピー</button></div><pre><code>public void connectTest() {
+    // ★ここで DB に接続してからメッセージを出す
+    // ヒント：引数は ScoreDAO のフィールド url, user, pass を使う
+    try (Connection con = DriverManager.getConnection(url, <span class="blank">____</span>, <span class="blank">____</span>)) {
+        // ★接続できたことが分かるメッセージを表示する
+        System.out.println(&quot;接続しました。&quot;);
+    } catch (SQLException e) {
+        e.printStackTrace(); // ★例外時は必ずスタックトレース
+    }
+}</code></pre></div>
+<p>動作確認の際は、<code>ScoreDAO</code> のインスタンスを生成し、<code>connectTest</code> メソッドを呼び出してください。</p>
+</section>
+<section class="exercise" id="演習5.2-のヒント" data-title="演習5.2 のヒント"><h2>演習5.2 のヒント</h2>
+<h3>仕様のポイント</h3>
+<ul><li><code>select()</code> メソッドを追加し、<code>score</code> テーブルから <code>name</code>, <code>score</code>, <code>datetime</code> を取得、<code>Score</code> オブジェクトに詰めて <code>ArrayList&lt;Score&gt;</code> で返す。</li><li>SQLは <code>&quot;SELECT name, score, datetime FROM score ORDER BY score&quot;</code>、<code>Statement</code> + <code>ResultSet</code> で処理、必ず接続を閉じること。</li></ul>
+<aside class="reference">※「Java データベースプログラミング」 142～146ページ を参照してください。</aside>
+<aside class="reference">※追加で、演習ガイド5.1の解答のソースコードも参照してください。</aside>
+<div class="code-shell" data-lang="java"><div class="code-toolbar"><span>java</span><button type="button">コピー</button></div><pre><code>public ArrayList&lt;Score&gt; select() {
+    String sql = &quot;SELECT name, score, datetime FROM score ORDER BY score&quot;;
+    ArrayList&lt;Score&gt; list = new ArrayList&lt;&gt;(); // ★リストのインスタンスを予め宣言（空っぽのリスト生成）
+
+    // ヒント：接続情報はフィールドの url, user, pass を使う
+    try (Connection con = DriverManager.getConnection(url, <span class="blank">____</span>, <span class="blank">____</span>)) {
+        // ★SQLを実行するための Statement を作る
+        Statement stmt = con.createStatement();
+
+        // ★SELECT文を実行すると、結果は ResultSet として返ってくる
+        // ヒント：SELECT用の実行メソッド。executeUpdate ではありません。
+        ResultSet rs = stmt.<span class="blank">____</span>(sql);
+
+        // ★次の行がある間だけループする
+        while (rs.next()) {
+            // ★ResultSet から name, score, datetime を取り出す
+            // ヒント：列名はSQL文の SELECT の後に書いた名前と同じ
+            String name = rs.getString(&quot;<span class="blank">____</span>&quot;);
+            long sc = rs.getLong(&quot;<span class="blank">____</span>&quot;);
+            String dt = rs.getString(&quot;<span class="blank">____</span>&quot;);
+
+            // ★取り出した3つの値で Score インスタンスを作る
+            // ヒント：Scoreの引数は「名前、long型スコア、日付文字列」の順
+            Score s = new Score(name, <span class="blank">____</span>, <span class="blank">____</span>);
+
+            // ★作成した Score を list に追加する
+            list.add(s);
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+
+    return list; // ★複数の記録が入っているリストを、main メソッドへ return する
+}</code></pre></div>
+<p>迷ったときは、次の順で1行ずつ確認してください。</p>
+<ol><li>SQL文だけを見て、取得する列名が <code>name</code>, <code>score</code>, <code>datetime</code> の3つだと確認する</li><li><code>ResultSet</code> から取り出す型を、<code>String</code>, <code>long</code>, <code>String</code> に分けて考える</li><li>取り出した値を <code>Score</code> のコンストラクタの引数順に並べる</li><li>最後に、作った <code>Score</code> を <code>ArrayList</code> に追加する</li></ol>
+<h3>動作確認例（<code>Ex5_2</code> Main メソッド）</h3>
+<div class="code-shell" data-lang="java"><div class="code-toolbar"><span>java</span><button type="button">コピー</button></div><pre><code>ScoreDAO dao = new ScoreDAO();
+
+// ★dao.select() の戻り値を拡張 for 文で1件ずつ取り出す
+for (Score s : dao.select()) {
+// ★取り出した Score を表示する
+    System.out.println(<span class="blank">____</span>);
+}</code></pre></div>
+<div class="code-shell" data-lang="text"><div class="code-toolbar"><span>text</span><button type="button">コピー</button></div><pre><code>さぶろう, 1分40秒200, 2023-02-02 12:34:56
+じろう, 2分30秒123, 2023-01-01 00:00:00</code></pre></div>
+</section>
+<section class="exercise" id="演習5.3-のヒント" data-title="演習5.3 のヒント"><h2>演習5.3 のヒント</h2>
+<h3>仕様のポイント</h3>
+<p><code>insert(Score score)</code> メソッドを追加し、<code>PreparedStatement</code> で <code>name</code> と <code>score</code> をバインド、<code>datetime</code> は <code>now()</code> で現在日時を自動設定します。</p>
+<p>SQLは <code>&quot;INSERT INTO score (name, score, datetime) VALUES (?, ?, now())&quot;</code> です。</p>
+<p>必ず接続を閉じ、例外時はトレース出力します。</p>
+<div class="code-shell" data-lang="java"><div class="code-toolbar"><span>java</span><button type="button">コピー</button></div><pre><code>public void insert(Score score) {
+    String sql = &quot;INSERT INTO score (name, score, datetime) VALUES (?, ?, now())&quot;;
+
+    // ヒント：接続情報はフィールドの url, user, pass を使う
+    try (Connection con = DriverManager.getConnection(url, <span class="blank">____</span>, <span class="blank">____</span>)) {
+        // ★? つきのSQLを実行するので PreparedStatement を作る
+        PreparedStatement ps = con.prepareStatement(sql);
+
+        // ★1つ目の ? には名前を入れる
+        // ヒント：Score から名前を取得する getter を使う
+        ps.setString(1, score.<span class="blank">____</span>());
+
+        // ★2つ目の ? には long 型のスコアを入れる
+        // ヒント：Score から long 型スコアを取得する getter を使う
+        ps.setLong(2, score.<span class="blank">____</span>());
+
+        // ★INSERT文を実行する
+        // ヒント：INSERT/UPDATE/DELETE用の実行メソッドです。
+        ps.<span class="blank">____</span>();
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+}</code></pre></div>
+<p><code>?</code> の順番と <code>setXxx</code> の番号は対応しています。1番目の <code>?</code> が名前、2番目の <code>?</code> がスコアです。<code>datetime</code> はSQLの <code>now()</code> が入れるため、Javaから値を渡す必要はありません。</p>
+<h3>動作確認例（<code>Ex5_3</code>）</h3>
+<div class="code-shell" data-lang="java"><div class="code-toolbar"><span>java</span><button type="button">コピー</button></div><pre><code>ScoreDAO dao = new ScoreDAO();
+
+// ★テスト用の Score を1件作る
+Score score = new Score(&quot;<span class="blank">____</span>&quot;, <span class="blank">____</span>, &quot;test&quot;);
+
+// ★insert メソッドでDBに登録する
+dao.insert(<span class="blank">____</span>);
+
+// ★select メソッドで登録後の一覧を表示する
+for (Score s : dao.select()) {
+    System.out.println(<span class="blank">____</span>);
+}</code></pre></div>
+<p>既存のランキングに「シロー, 3時間25分45秒678, …」が追加されます。</p>
+</section>
+<section class="exercise" id="演習5.4-のヒント" data-title="演習5.4 のヒント"><h2>演習5.4 のヒント</h2>
+<h3>仕様のポイント</h3>
+<p>今まで実装したパーツを、組み立てれば完成です。</p>
+<ol><li>演習3.3のソースコードでタイピング測定をする</li><li>演習5.3の <code>insert</code> メソッドを呼び出し、DBにタイピング結果を記録する</li><li>演習5.2の <code>select</code> メソッドを呼び出し、<code>return</code> される <code>ArrayList</code> の記録データを、拡張for文で出力します</li></ol>
+<p><code>Score</code> オブジェクト生成時の時間は、任意の文字列（<code>now</code> など）で大丈夫です。登録される時は、演習5.3で作った通りに、MySQL の <code>now()</code> 関数で現在の時間が登録されるからです。</p>
+<p>登録後、<code>dao.select()</code> で取得した <code>ArrayList&lt;Score&gt;</code> をループ出力し、ヘッダ <code>*** ランキング ***</code> を付けます。</p>
+<div class="code-shell" data-lang="java"><div class="code-toolbar"><span>java</span><button type="button">コピー</button></div><pre><code>// タイピング処理後…
+// ★時間計測を止める
+stopwatch.stop();
+
+// ★計測結果から Score を作る
+// ヒント：名前は入力済みの name、スコアは stopwatch から取得する
+Score score = new Score(<span class="blank">____</span>, stopwatch.getLongScore(), &quot;now&quot;);
+
+// ★DB 登録
+// 1. ScoreDAO のインスタンスを作る
+ScoreDAO dao = new ScoreDAO();
+// 2. insert メソッドに、作成した Score を渡す
+dao.insert(<span class="blank">____</span>);
+
+// ★ランキング表示
+// 1. 見出しを表示する
+System.out.println(&quot;*** ランキング ***&quot;);
+// 2. select メソッドで一覧を取得する
+// 3. 拡張 for 文で1件ずつ表示する
+for (Score s : dao.select()) {
+    System.out.println(<span class="blank">____</span>);
+}</code></pre></div>
+<p>ここでは「タイピング結果を表示する処理」と「DBに登録してランキングを表示する処理」を分けて考えると整理しやすいです。まずコンソールに結果が出ることを確認し、その後でDB登録、最後にランキング表示を足してください。</p>
+<p class="lead-label">実行例:</p>
+<div class="code-shell" data-lang="text"><div class="code-toolbar"><span>text</span><button type="button">コピー</button></div><pre><code>終了！
+世界太郎さんの結果：17秒11
+*** ランキング ***
+世界太郎, 17秒11, 2023-03-02 15:25:50
+さぶろう, 1分40秒200, 2023-02-02 12:34:56</code></pre></div>
+<p>上記ポイントをヒントに、「これまで作成した <code>KB</code>, <code>TypingFile</code>, <code>Stopwatch</code>, <code>Score</code> クラス」と組み合わせて実装を進めてください。</p>
+<p>特に、DB接続 → 登録 → 検索 → 表示の流れを一連で通す位置と、例外処理・リソース解放の確実性に注意すると全体がスムーズに動作します。</p>
+</section>
+<p class="no-results" id="noResults">該当する演習がありません。検索語を変えてください。</p>
+</main>
+</div>
+<script>
+const search = document.getElementById('search');
+const sections = Array.from(document.querySelectorAll('.exercise'));
+const noResults = document.getElementById('noResults');
+search.addEventListener('input', () => {
+  const q = search.value.trim().toLowerCase();
+  let shown = 0;
+  sections.forEach(section => {
+    const hit = !q || section.textContent.toLowerCase().includes(q);
+    section.classList.toggle('hidden', !hit);
+    if (hit) shown++;
+  });
+  noResults.style.display = shown ? 'none' : 'block';
+});
+document.querySelectorAll('.code-toolbar button').forEach(button => {
+  button.addEventListener('click', async () => {
+    const code = button.closest('.code-shell').querySelector('code').innerText;
+    await navigator.clipboard.writeText(code);
+    const old = button.textContent;
+    button.textContent = 'コピー済み';
+    setTimeout(() => button.textContent = old, 1200);
+  });
+});
+const progress = document.getElementById('progress');
+window.addEventListener('scroll', () => {
+  const max = document.documentElement.scrollHeight - window.innerHeight;
+  progress.style.width = max > 0 ? `${(window.scrollY / max) * 100}%` : '0';
+});
+const tocLinks = Array.from(document.querySelectorAll('nav a'));
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      tocLinks.forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + entry.target.id));
+    }
+  });
+}, { rootMargin: '-30% 0px -60% 0px', threshold: 0 });
+sections.forEach(section => observer.observe(section));
+</script>
+</body>
+</html>
