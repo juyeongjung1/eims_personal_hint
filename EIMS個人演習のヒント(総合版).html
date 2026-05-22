@@ -598,30 +598,30 @@ score（表示用の文字列）
 <div class="code-shell" data-lang="java"><div class="code-toolbar"><span>java</span><button type="button">コピー</button></div><pre><code><span class="tok-class">Stopwatch</span> <span class="tok-variable">sw</span> = <span class="tok-keyword">new</span> <span class="tok-method">Stopwatch</span>();
 <span class="tok-variable">sw</span>.<span class="tok-method">start</span>();</code></pre></div>
 <h3>5. 問題ループ</h3>
-<div class="code-shell" data-lang="java"><div class="code-toolbar"><span>java</span><button type="button">コピー</button></div><pre><code><span class="tok-keyword">while</span> (<span class="tok-variable">keywords</span>.<span class="tok-method">size</span>() &gt; <span class="tok-number">0</span>) {
-<span class="code-comment">    <span class="tok-comment">// ★残り問題数を表示する</span></span>
-<span class="code-comment">    <span class="tok-comment">// ヒント：keywords.size() を文字列とつなげる</span></span>
+<div class="code-shell" data-lang="java"><div class="code-toolbar"><span>java</span><button type="button">コピー</button></div><pre><code><span class="tok-keyword">while</span> (<span class="tok-variable">keywords</span>.<span class="blank">____</span>() &gt; <span class="tok-number">0</span>) {
+<span class="code-comment">    <span class="tok-comment">// ★問題が何問残っているかを表示する</span></span>
     <span class="tok-class">System</span>.<span class="tok-variable">out</span>.<span class="tok-method">println</span>(<span class="tok-string">&quot;あと&quot;</span> + <span class="tok-variable">keywords</span>.<span class="blank">____</span>() + <span class="tok-string">&quot;問&quot;</span>);
 
-<span class="code-comment">    <span class="tok-comment">// ★先頭の問題を表示して、入力を1行受け取る</span></span>
-<span class="code-comment">    <span class="tok-comment">// ヒント：リストの0番目は keywords.get(0)</span></span>
-    <span class="tok-class">System</span>.<span class="tok-variable">out</span>.<span class="tok-method">print</span>(<span class="tok-variable">keywords</span>.<span class="blank">____</span>(<span class="tok-number">0</span>) + <span class="tok-string">&quot;&gt; &quot;</span>);
+<span class="code-comment">    <span class="tok-comment">// ★現在の問題を表示して、入力を1行受け取る</span></span>
+    <span class="tok-class">System</span>.<span class="tok-variable">out</span>.<span class="tok-method">print</span>(<span class="tok-variable">keywords</span>.<span class="blank">____</span>(<span class="blank">____</span>) + <span class="tok-string">&quot;&gt; &quot;</span>);
     <span class="tok-class">String</span> <span class="tok-variable">line</span> = <span class="tok-class">KB</span>.<span class="tok-method">readLine</span>();
 
-<span class="code-comment">    <span class="tok-comment">// ★文字列の比較なので == ではなく equals を使う</span></span>
-<span class="code-comment">    <span class="tok-comment">// ヒント：line と keywords.get(0) を比較する</span></span>
-    <span class="tok-keyword">if</span> (<span class="tok-variable">line</span>.<span class="tok-method">equals</span>(<span class="blank">____</span>)) {
-<span class="code-comment">        <span class="tok-comment">// ★正解なら、出題済みの先頭問題を削除する</span></span>
+<span class="code-comment">    <span class="tok-comment">// ★入力内容と、現在の問題が一致しているかを判定する</span></span>
+    <span class="tok-keyword">if</span> (<span class="tok-variable">line</span>.<span class="tok-method">equals</span>(<span class="tok-variable">keywords</span>.<span class="blank">____</span>(<span class="blank">____</span>))) {
+<span class="code-comment">        <span class="tok-comment">// ★正解した問題をリストから取り除く</span></span>
         <span class="tok-variable">keywords</span>.<span class="tok-method">remove</span>(<span class="blank">____</span>);
 
-<span class="code-comment">        <span class="tok-comment">// ★残り問題の出題順をランダム化する</span></span>
+<span class="code-comment">        <span class="tok-comment">// ★残りの問題の順番を変える</span></span>
         <span class="tok-class">Collections</span>.<span class="tok-method">shuffle</span>(<span class="blank">____</span>);
     } <span class="tok-keyword">else</span> {
-<span class="code-comment">        <span class="tok-comment">// ★不正解時のメッセージを表示する</span></span>
+<span class="code-comment">        <span class="tok-comment">// ★不正解のときのメッセージを表示する</span></span>
         <span class="tok-class">System</span>.<span class="tok-variable">out</span>.<span class="tok-method">println</span>(<span class="tok-string">&quot;____&quot;</span>);
     }
 }</code></pre></div>
-<p>ここでは、変数名が混ざりやすいです。問題リストは <code>keywords</code>、入力された文字列は <code>line</code> と考えると整理しやすくなります。</p>
+<p>ここでは、変数名が混ざりやすいです。</p>
+<p><code>keywords</code> は「まだ残っている問題のリスト」、<code>line</code> は「受講者が入力した文字列」と考えると整理しやすくなります。</p>
+<p>迷ったときは、次の順番で考えてください。</p>
+<div class="table-wrap"><table><thead><tr><th>やりたいこと</th><th>見る対象</th><th>考えること</th></tr></thead><tbody><tr><td>残り問題数を知りたい</td><td><code>keywords</code></td><td>リストの個数を調べるにはどうするか</td></tr><tr><td>今の問題を表示したい</td><td><code>keywords</code></td><td>リストの先頭要素を取り出すにはどうするか</td></tr><tr><td>正誤判定をしたい</td><td><code>line</code> と現在の問題</td><td>文字列の中身を比較するにはどうするか</td></tr><tr><td>正解した問題を消したい</td><td><code>keywords</code></td><td>リストから指定位置の要素を削除するにはどうするか</td></tr><tr><td>次の出題順を変えたい</td><td><code>keywords</code></td><td>リスト全体をシャッフルするにはどうするか</td></tr></tbody></table></div>
 <p class="lead-label">実行例:</p>
 <div class="code-shell" data-lang="text"><div class="code-toolbar"><span>text</span><button type="button">コピー</button></div><pre><code>...
 ...
@@ -634,14 +634,14 @@ byte&gt; byte
 <span class="tok-variable">sw</span>.<span class="tok-method">stop</span>();
 
 <span class="code-comment"><span class="tok-comment">// ★名前、計測結果、任意の日付文字列を使って Score を作る</span></span>
-<span class="code-comment"><span class="tok-comment">// ヒント：new Score(名前, long型のスコア, 任意の文字列)</span></span>
+<span class="tok-comment">// Scoreのコンストラクタ引数の順番を確認する</span>
 <span class="tok-class">Score</span> <span class="tok-variable">s</span> = <span class="tok-keyword">new</span> <span class="tok-method">Score</span>(<span class="blank">____</span>, <span class="tok-variable">sw</span>.<span class="tok-method">getLongScore</span>(), <span class="tok-string">&quot;now&quot;</span>);
 
 <span class="code-comment"><span class="tok-comment">// ★終了メッセージと結果を表示する</span></span>
 <span class="tok-class">System</span>.<span class="tok-variable">out</span>.<span class="tok-method">println</span>(<span class="tok-string">&quot;終了！&quot;</span>);
 <span class="tok-class">System</span>.<span class="tok-variable">out</span>.<span class="tok-method">println</span>(<span class="tok-variable">name</span> + <span class="tok-string">&quot;さんの結果：&quot;</span> + <span class="tok-variable">s</span>.<span class="blank">____</span>());
 
-<span class="tok-comment">// ここに、結果を出力するコードを書いてください。</span></code></pre></div>
+<span class="tok-comment">// 必要な表示が足りない場合は、ここに追加する</span></code></pre></div>
 <p>この問題の実行例では、時間まで出力しなくても良いので、コンストラクタの第3引数には、任意の文字列を入れておけばOKです。</p>
 </section>
 <section class="exercise" id="演習4.1-のヒント" data-title="演習4.1 のヒント" data-group="ex4"><h2>演習4.1 のヒント</h2>
