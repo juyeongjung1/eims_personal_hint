@@ -449,6 +449,9 @@ code {{ background: #eef2f1; padding: 0.1em 0.35em; border-radius: 4px; font-fam
   border-radius: 8px; overflow: hidden; margin: 18px 0;
   box-shadow: 0 1px 2px rgba(20, 30, 28, 0.05);
 }}
+.code-shell code {{
+  background: transparent; padding: 0; border-radius: 0;
+}}
 .code-toolbar {{
   display: flex; justify-content: space-between; align-items: center; padding: 8px 12px;
   background: var(--code-head); color: #2e4b45; font-size: 12px; border-bottom: 1px solid var(--code-line);
