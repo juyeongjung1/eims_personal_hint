@@ -59,6 +59,37 @@ body {
 .tabs button:hover { border-color: var(--green); color: var(--green); background: var(--green-soft); }
 .tabs button.active { background: var(--green); border-color: var(--green); color: white; }
 main { max-width: 1040px; width: 100%; margin: 0 auto; padding: 40px 42px 80px; }
+.admin-area {
+  background: #fdfefe; border: 1px solid var(--line); border-radius: 8px;
+  margin: 34px 0 0; padding: 18px; color: var(--ink);
+}
+.admin-actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.admin-button {
+  border: 1px solid var(--line-strong); background: white; color: #203431;
+  border-radius: 6px; padding: 8px 12px; cursor: pointer; font-weight: 700;
+}
+.admin-button.primary { background: var(--green); border-color: var(--green); color: white; }
+.admin-login, .admin-panel { display: none; margin-top: 14px; }
+.admin-login.active, .admin-panel.active { display: block; }
+.admin-login input {
+  width: min(260px, 100%); height: 38px; border: 1px solid var(--line); border-radius: 6px;
+  padding: 0 10px; margin-right: 8px;
+}
+.admin-message { color: var(--red); font-size: 13px; margin: 8px 0 0; }
+.schedule-grid {
+  display: grid; grid-template-columns: repeat(5, minmax(120px, 1fr)); gap: 10px; margin: 10px 0 14px;
+}
+.schedule-grid label {
+  display: grid; gap: 5px; font-weight: 700; color: #2c393b; font-size: 13px;
+}
+.schedule-grid input {
+  height: 38px; border: 1px solid var(--line); border-radius: 6px; padding: 0 8px; background: white;
+}
+.release-note {
+  display: inline-flex; align-items: center; gap: 6px; color: var(--amber);
+  background: var(--amber-soft); border: 1px solid #e3bd66; border-radius: 999px;
+  padding: 3px 9px; font-size: 12px; font-weight: 700; margin-left: 8px;
+}
 .doc-hero {
   padding: 20px 0 30px; border-bottom: 2px solid var(--line); margin-bottom: 26px;
 }
@@ -140,6 +171,8 @@ figcaption { font-size: 13px; color: var(--muted); padding: 8px 12px; border-top
   .topbar { position: static; margin-top: 0; }
   .topbar-row { grid-template-columns: 1fr; }
   .search-status { text-align: left; }
+  .admin-login input { display: block; margin: 0 0 8px; }
+  .schedule-grid { grid-template-columns: 1fr; }
   .exercise { padding: 20px 16px; }
   h1 { font-size: 27px; }
 }
@@ -657,7 +690,32 @@ for (Score s : dao.select()) {
 <p>上記ポイントをヒントに、「これまで作成した <code>KB</code>, <code>TypingFile</code>, <code>Stopwatch</code>, <code>Score</code> クラス」と組み合わせて実装を進めてください。</p>
 <p>特に、DB接続 → 登録 → 検索 → 表示の流れを一連で通す位置と、例外処理・リソース解放の確実性に注意すると全体がスムーズに動作します。</p>
 </section>
-<p class="no-results" id="noResults">該当する演習がありません。検索語を変えてください。</p>
+<p class="no-results" id="noResults">該当する演習がありません。検索語または公開時刻を確認してください。</p>
+<section class="admin-area" aria-label="管理者設定">
+  <div class="admin-actions">
+    <button type="button" class="admin-button" id="adminLoginButton">管理者でログイン</button>
+    <span id="scheduleSummary"></span>
+  </div>
+  <div class="admin-login" id="adminLogin">
+    <input id="adminPassword" type="password" autocomplete="current-password" placeholder="管理者パスワード">
+    <button type="button" class="admin-button primary" id="adminAuthButton">ログイン</button>
+    <p class="admin-message" id="adminMessage"></p>
+  </div>
+  <div class="admin-panel" id="adminPanel">
+    <div class="schedule-grid">
+      <label>演習1<input type="time" data-release-input="ex1"></label>
+      <label>演習2<input type="time" data-release-input="ex2"></label>
+      <label>演習3<input type="time" data-release-input="ex3"></label>
+      <label>演習4<input type="time" data-release-input="ex4"></label>
+      <label>演習5<input type="time" data-release-input="ex5"></label>
+    </div>
+    <div class="admin-actions">
+      <button type="button" class="admin-button primary" id="saveSchedule">公開時刻を保存</button>
+      <button type="button" class="admin-button" id="clearSchedule">公開時刻をすべて解除</button>
+      <span id="saveMessage"></span>
+    </div>
+  </div>
+</section>
 </main>
 </div>
 <script>
@@ -666,7 +724,70 @@ const sections = Array.from(document.querySelectorAll('.exercise'));
 const noResults = document.getElementById('noResults');
 const searchStatus = document.getElementById('searchStatus');
 const tabButtons = Array.from(document.querySelectorAll('[data-tab]'));
+const adminLoginButton = document.getElementById('adminLoginButton');
+const adminLogin = document.getElementById('adminLogin');
+const adminPassword = document.getElementById('adminPassword');
+const adminAuthButton = document.getElementById('adminAuthButton');
+const adminMessage = document.getElementById('adminMessage');
+const adminPanel = document.getElementById('adminPanel');
+const scheduleInputs = Array.from(document.querySelectorAll('[data-release-input]'));
+const saveSchedule = document.getElementById('saveSchedule');
+const clearSchedule = document.getElementById('clearSchedule');
+const saveMessage = document.getElementById('saveMessage');
+const scheduleSummary = document.getElementById('scheduleSummary');
+const scheduleKey = 'eimsHintReleaseSchedule';
+const adminHash = 'c775e7b757ede630cd0aa1113bd102661ab38829ca52a6422ab782862f268646';
+let releaseSchedule = loadSchedule();
 let activeGroup = 'all';
+
+function loadSchedule() {
+  try {
+    return JSON.parse(localStorage.getItem(scheduleKey) || '{}');
+  } catch {
+    return {};
+  }
+}
+
+function saveScheduleValues() {
+  releaseSchedule = Object.fromEntries(
+    scheduleInputs
+      .map(input => [input.dataset.releaseInput, input.value])
+      .filter(([, value]) => value)
+  );
+  localStorage.setItem(scheduleKey, JSON.stringify(releaseSchedule));
+  updateScheduleSummary();
+  applyFilters();
+}
+
+function hydrateScheduleForm() {
+  scheduleInputs.forEach(input => {
+    input.value = releaseSchedule[input.dataset.releaseInput] || '';
+  });
+}
+
+function minutesOfDay(timeText) {
+  const [hour, minute] = timeText.split(':').map(Number);
+  return hour * 60 + minute;
+}
+
+function isReleased(group) {
+  const releaseTime = releaseSchedule[group];
+  if (!releaseTime) return true;
+  const now = new Date();
+  const currentMinutes = now.getHours() * 60 + now.getMinutes();
+  return currentMinutes >= minutesOfDay(releaseTime);
+}
+
+function releaseLabel(group) {
+  return releaseSchedule[group] ? `${releaseSchedule[group]}公開` : '';
+}
+
+function updateScheduleSummary() {
+  const items = Object.entries(releaseSchedule)
+    .filter(([, time]) => time)
+    .map(([group, time]) => `演習${group.replace('ex', '')} ${time}`);
+  scheduleSummary.textContent = items.length ? `公開時刻: ${items.join(' / ')}` : '公開時刻は未設定です';
+}
 
 function applyFilters() {
   const q = search.value.trim().toLowerCase();
@@ -674,8 +795,18 @@ function applyFilters() {
   sections.forEach(section => {
     const groupHit = activeGroup === 'all' || section.dataset.group === activeGroup;
     const searchHit = !q || section.textContent.toLowerCase().includes(q);
-    const hit = groupHit && searchHit;
+    const releaseHit = isReleased(section.dataset.group);
+    const hit = groupHit && searchHit && releaseHit;
     section.classList.toggle('hidden', !hit);
+    const heading = section.querySelector('h2');
+    const existingNote = heading && heading.querySelector('.release-note');
+    if (existingNote) existingNote.remove();
+    if (heading && releaseSchedule[section.dataset.group]) {
+      const note = document.createElement('span');
+      note.className = 'release-note';
+      note.textContent = releaseLabel(section.dataset.group);
+      heading.appendChild(note);
+    }
     if (hit) shown++;
   });
   noResults.style.display = shown ? 'none' : 'block';
@@ -692,6 +823,46 @@ tabButtons.forEach(button => {
     if (firstVisible) firstVisible.scrollIntoView({ behavior: 'smooth', block: 'start' });
   });
 });
+async function digest(text) {
+  const data = new TextEncoder().encode(text);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+  return Array.from(new Uint8Array(hashBuffer)).map(byte => byte.toString(16).padStart(2, '0')).join('');
+}
+
+adminLoginButton.addEventListener('click', () => {
+  adminLogin.classList.toggle('active');
+  adminPassword.focus();
+});
+
+adminAuthButton.addEventListener('click', async () => {
+  adminMessage.textContent = '';
+  const hashed = await digest(adminPassword.value);
+  if (hashed !== adminHash) {
+    adminMessage.textContent = 'パスワードが違います。';
+    return;
+  }
+  adminPassword.value = '';
+  adminLogin.classList.remove('active');
+  adminPanel.classList.add('active');
+  hydrateScheduleForm();
+});
+
+saveSchedule.addEventListener('click', () => {
+  saveScheduleValues();
+  saveMessage.textContent = '保存しました。';
+  setTimeout(() => saveMessage.textContent = '', 1400);
+});
+
+clearSchedule.addEventListener('click', () => {
+  releaseSchedule = {};
+  localStorage.removeItem(scheduleKey);
+  hydrateScheduleForm();
+  updateScheduleSummary();
+  applyFilters();
+  saveMessage.textContent = '解除しました。';
+  setTimeout(() => saveMessage.textContent = '', 1400);
+});
+
 document.querySelectorAll('.code-toolbar button').forEach(button => {
   button.addEventListener('click', async () => {
     const code = button.closest('.code-shell').querySelector('code').innerText;
@@ -706,7 +877,10 @@ window.addEventListener('scroll', () => {
   const max = document.documentElement.scrollHeight - window.innerHeight;
   progress.style.width = max > 0 ? `${(window.scrollY / max) * 100}%` : '0';
 });
+hydrateScheduleForm();
+updateScheduleSummary();
 applyFilters();
+setInterval(applyFilters, 30000);
 </script>
 </body>
 </html>
