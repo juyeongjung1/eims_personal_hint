@@ -31,20 +31,26 @@ body {
   line-height: 1.78;
 }
 .progress { position: fixed; inset: 0 auto auto 0; height: 4px; width: 0; background: var(--green); z-index: 5; }
-.layout { display: grid; grid-template-columns: 280px minmax(0, 1fr); min-height: 100vh; }
-.sidebar {
-  position: sticky; top: 0; height: 100vh; overflow: auto;
-  padding: 24px 18px; border-right: 1px solid var(--line); background: #fbfcfa;
+.layout { min-height: 100vh; }
+.brand { font-weight: 700; font-size: 15px; color: var(--green); }
+.topbar {
+  position: sticky; top: 0; z-index: 3;
+  background: rgba(247, 248, 245, 0.96); backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--line); margin: -12px 0 20px; padding: 12px 0 14px;
 }
-.brand { font-weight: 700; font-size: 15px; margin-bottom: 16px; color: var(--green); }
+.topbar-row {
+  display: grid; grid-template-columns: 180px minmax(220px, 1fr) auto; gap: 12px;
+  align-items: center; margin-bottom: 10px;
+}
 .search {
   width: 100%; height: 40px; border: 1px solid var(--line); border-radius: 6px;
   padding: 0 10px; background: white; font-size: 14px;
 }
+.search-status {
+  color: var(--muted); font-size: 13px; white-space: nowrap; text-align: right;
+}
 .tabs {
-  position: sticky; top: 0; z-index: 3; display: flex; flex-wrap: wrap; gap: 8px;
-  background: rgba(247, 248, 245, 0.94); backdrop-filter: blur(8px);
-  padding: 10px 0 14px; margin: -12px 0 18px; border-bottom: 1px solid var(--line);
+  display: flex; flex-wrap: wrap; gap: 8px;
 }
 .tabs button {
   border: 1px solid var(--line-strong); background: white; color: #203431;
@@ -52,13 +58,7 @@ body {
 }
 .tabs button:hover { border-color: var(--green); color: var(--green); background: var(--green-soft); }
 .tabs button.active { background: var(--green); border-color: var(--green); color: white; }
-nav { display: grid; gap: 4px; margin-top: 18px; }
-nav a {
-  color: var(--ink); text-decoration: none; padding: 8px 10px; border-radius: 6px;
-  font-size: 14px; line-height: 1.35;
-}
-nav a:hover, nav a.active { background: var(--green-soft); color: var(--green); }
-main { max-width: 1040px; width: 100%; padding: 40px 42px 80px; }
+main { max-width: 1040px; width: 100%; margin: 0 auto; padding: 40px 42px 80px; }
 .doc-hero {
   padding: 20px 0 30px; border-bottom: 2px solid var(--line); margin-bottom: 26px;
 }
@@ -134,12 +134,12 @@ figure { margin: 18px 0; border: 1px solid var(--line); border-radius: 8px; over
 figure img { display: block; width: 100%; height: auto; }
 figcaption { font-size: 13px; color: var(--muted); padding: 8px 12px; border-top: 1px solid var(--line); }
 .no-results { display: none; padding: 18px; background: var(--amber-soft); color: var(--amber); border-radius: 8px; }
-.exercise.hidden, nav a.hidden { display: none; }
+.exercise.hidden { display: none; }
 @media (max-width: 860px) {
-  .layout { grid-template-columns: 1fr; }
-  .sidebar { position: static; height: auto; border-right: 0; border-bottom: 1px solid var(--line); }
   main { padding: 24px 16px 60px; }
-  .tabs { position: static; margin-top: 0; }
+  .topbar { position: static; margin-top: 0; }
+  .topbar-row { grid-template-columns: 1fr; }
+  .search-status { text-align: left; }
   .exercise { padding: 20px 16px; }
   h1 { font-size: 27px; }
 }
@@ -148,33 +148,21 @@ figcaption { font-size: 13px; color: var(--muted); padding: 8px 12px; border-top
 <body>
 <div class="progress" id="progress"></div>
 <div class="layout">
-<aside class="sidebar">
-  <div class="brand">EIMS 個人演習のヒント</div>
-  <input class="search" id="search" type="search" placeholder="演習・用語を検索">
-  <nav id="toc"><a href="#演習1.1-のヒント" data-group="ex1">演習1.1 のヒント</a>
-<a href="#演習1.2-のヒント" data-group="ex1">演習1.2 のヒント</a>
-<a href="#演習2.1-のヒント" data-group="ex2">演習2.1 のヒント</a>
-<a href="#演習2.2-のヒント" data-group="ex2">演習2.2 のヒント</a>
-<a href="#演習2.3-のヒント" data-group="ex2">演習2.3 のヒント</a>
-<a href="#演習3.1-のヒント" data-group="ex3">演習3.1 のヒント</a>
-<a href="#演習3.2-のヒント" data-group="ex3">演習3.2 のヒント</a>
-<a href="#演習3.3-のヒント" data-group="ex3">演習3.3 のヒント</a>
-<a href="#演習4.1-のヒント" data-group="ex4">演習4.1 のヒント</a>
-<a href="#演習4.2-のヒント" data-group="ex4">演習4.2 のヒント</a>
-<a href="#演習4.3-のヒント" data-group="ex4">演習4.3 のヒント</a>
-<a href="#演習5.1-のヒント" data-group="ex5">演習5.1 のヒント</a>
-<a href="#演習5.2-のヒント" data-group="ex5">演習5.2 のヒント</a>
-<a href="#演習5.3-のヒント" data-group="ex5">演習5.3 のヒント</a>
-<a href="#演習5.4-のヒント" data-group="ex5">演習5.4 のヒント</a></nav>
-</aside>
 <main>
-<div class="tabs" role="tablist" aria-label="演習グループ">
-  <button type="button" class="active" data-tab="all">すべて</button>
-  <button type="button" data-tab="ex1">演習1</button>
-  <button type="button" data-tab="ex2">演習2</button>
-  <button type="button" data-tab="ex3">演習3</button>
-  <button type="button" data-tab="ex4">演習4</button>
-  <button type="button" data-tab="ex5">演習5</button>
+<div class="topbar">
+  <div class="topbar-row">
+    <div class="brand">EIMS 個人演習のヒント</div>
+    <input class="search" id="search" type="search" placeholder="演習番号・用語・コードを検索">
+    <div class="search-status" id="searchStatus">15件表示中</div>
+  </div>
+  <div class="tabs" role="tablist" aria-label="演習グループ">
+    <button type="button" class="active" data-tab="all">すべて</button>
+    <button type="button" data-tab="ex1">演習1</button>
+    <button type="button" data-tab="ex2">演習2</button>
+    <button type="button" data-tab="ex3">演習3</button>
+    <button type="button" data-tab="ex4">演習4</button>
+    <button type="button" data-tab="ex5">演習5</button>
+  </div>
 </div>
 <header class="doc-hero"><p class="kicker">EIMS 個人演習</p><h1>EIMS個人演習のヒント（総合版）</h1><p>ヒントを演習ごとに整理し、参照テキスト・コード・重要ポイントを読みやすくまとめたHTML版です。</p></header>
 <section class="exercise" id="演習1.1-のヒント" data-title="演習1.1 のヒント" data-group="ex1"><h2>演習1.1 のヒント</h2>
@@ -676,8 +664,8 @@ for (Score s : dao.select()) {
 const search = document.getElementById('search');
 const sections = Array.from(document.querySelectorAll('.exercise'));
 const noResults = document.getElementById('noResults');
+const searchStatus = document.getElementById('searchStatus');
 const tabButtons = Array.from(document.querySelectorAll('[data-tab]'));
-const tocLinks = Array.from(document.querySelectorAll('nav a'));
 let activeGroup = 'all';
 
 function applyFilters() {
@@ -690,13 +678,8 @@ function applyFilters() {
     section.classList.toggle('hidden', !hit);
     if (hit) shown++;
   });
-  tocLinks.forEach(link => {
-    const groupHit = activeGroup === 'all' || link.dataset.group === activeGroup;
-    const target = document.querySelector(link.getAttribute('href'));
-    const searchHit = !q || (target && target.textContent.toLowerCase().includes(q));
-    link.classList.toggle('hidden', !(groupHit && searchHit));
-  });
   noResults.style.display = shown ? 'none' : 'block';
+  searchStatus.textContent = `${shown}件表示中`;
 }
 
 search.addEventListener('input', applyFilters);
@@ -723,14 +706,6 @@ window.addEventListener('scroll', () => {
   const max = document.documentElement.scrollHeight - window.innerHeight;
   progress.style.width = max > 0 ? `${(window.scrollY / max) * 100}%` : '0';
 });
-const observer = new IntersectionObserver(entries => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting) {
-      tocLinks.forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + entry.target.id));
-    }
-  });
-}, { rootMargin: '-30% 0px -60% 0px', threshold: 0 });
-sections.forEach(section => observer.observe(section));
 applyFilters();
 </script>
 </body>
