@@ -198,18 +198,44 @@ figcaption { font-size: 13px; color: var(--muted); padding: 8px 12px; border-top
 <header class="doc-hero"><p class="kicker">EIMS 個人演習</p><h1>EIMS個人演習のヒント（総合版）</h1><p>ヒントを演習ごとに整理し、参照テキスト・コード・重要ポイントを読みやすくまとめたHTML版です。</p></header>
 <section class="exercise" id="演習1.1-のヒント" data-title="演習1.1 のヒント" data-group="ex1"><h2>演習1.1 のヒント</h2>
 <h3 class="point-heading">仕様確認</h3>
-<p>「5つの問題を格納する配列を作成し…」という部分を仕様書で再度確認してください。</p>
+<p>この演習では、タイピング練習で使う「問題の一覧」を配列で用意し、その中身を順番に表示します。</p>
+<p>問題文では、次の2つを実装することが求められています。</p>
+<div class="table-wrap"><table><thead><tr><th>やること</th><th>内容</th></tr></thead><tbody><tr><td>問題数を表示する</td><td>配列に入っている問題が何個あるかを表示する</td></tr><tr><td>問題を表示する</td><td>配列の中身を先頭から順番に表示する</td></tr></tbody></table></div>
+<p>つまり、難しい処理を作るというより、「配列を作る」「配列の個数を調べる」「配列の中身を1つずつ取り出す」練習です。</p>
 <aside class="reference">※「Java によるデータ構造とアルゴリズム」 154～159ページ を参照してください。</aside>
-<h3>配列の宣言・初期化</h3>
+<h3>1. まず、問題を配列に入れる</h3>
+<p>タイピングの問題は1つだけではなく、複数あります。</p>
+<p>複数の文字列をまとめて持ちたいときは、<code>String[]</code> の配列を使います。</p>
 <div class="code-shell" data-lang="java"><div class="code-toolbar"><span>java</span><button type="button">コピー</button></div><pre><code>String[] keywords = { &quot;class&quot;, &quot;int&quot;, &quot;boolean&quot;, &quot;if&quot;, &quot;while&quot; };</code></pre></div>
-<p>この記述方法が分かりにくい場合は、<code>String[]</code>（型）と変数名、<code>{}</code> 内に要素をカンマで区切って並べるルールを理解してください。</p>
-<h3>要素数の取得</h3>
-<p><code>keywords.length</code> と記述する際につまずきやすいです。<code>length()</code> メソッドではなくプロパティである点に留意してください。</p>
-<h3>拡張 for 文</h3>
+<p>この1行は、次のように分けて読むと分かりやすいです。</p>
+<div class="table-wrap"><table><thead><tr><th>部分</th><th>意味</th></tr></thead><tbody><tr><td><code>String[]</code></td><td>文字列を複数入れられる配列</td></tr><tr><td><code>keywords</code></td><td>配列の変数名</td></tr><tr><td><code>{ ... }</code></td><td>配列の中に入れる値の一覧</td></tr><tr><td><code>&quot;class&quot;</code> など</td><td>実際のタイピング問題</td></tr></tbody></table></div>
+<p><code>{}</code> の中には、問題にしたい文字列をカンマ <code>,</code> で区切って並べます。</p>
+<h3>2. 問題数を表示する</h3>
+<p>配列に入っている要素の数は、<code>配列名.length</code> で取得できます。</p>
+<p>この演習では、<code>keywords</code> という配列を作っているので、問題数は次のように取得します。</p>
+<div class="code-shell" data-lang="java"><div class="code-toolbar"><span>java</span><button type="button">コピー</button></div><pre><code>keywords.length</code></pre></div>
+<aside class="caution-box"><strong>注意</strong><p>注意してください。配列の要素数は、<code>length()</code> ではありません。</p></aside>
+<div class="table-wrap"><table><thead><tr><th>書き方</th><th>正しいか</th><th>理由</th></tr></thead><tbody><tr><td><code>keywords.length</code></td><td>正しい</td><td>配列の要素数を表すプロパティ</td></tr><tr><td><code>keywords.length()</code></td><td>間違い</td><td>配列では <code>length()</code> メソッドを使わない</td></tr></tbody></table></div>
+<p>文字列と組み合わせると、実行例のように「5個の問題があります」と表示できます。</p>
+<div class="code-shell" data-lang="java"><div class="code-toolbar"><span>java</span><button type="button">コピー</button></div><pre><code>System.out.println(keywords.length + &quot;個の問題があります&quot;);</code></pre></div>
+<h3>3. 配列の中身を1つずつ表示する</h3>
+<p>問題数を表示したら、次は配列の中身を1つずつ表示します。</p>
+<p>ここでは、拡張for文を使います。</p>
 <div class="code-shell" data-lang="java"><div class="code-toolbar"><span>java</span><button type="button">コピー</button></div><pre><code>for (String word : keywords) {
     System.out.println(word);
 }</code></pre></div>
-<p>構文は「型 変数名 : 配列名」の順序で書きます。ループごとに配列の先頭から順に要素が取り出される仕組みをイメージすると理解しやすいです。</p>
+<p>この文は、次のように読むと分かりやすいです。</p>
+<div class="code-shell" data-lang="text"><div class="code-toolbar"><span>text</span><button type="button">コピー</button></div><pre><code>keywords の中から、1つずつ取り出す。
+取り出した1つ分の値を、word という変数に入れる。
+word を表示する。</code></pre></div>
+<p><code>for (String word : keywords)</code> の各部分は、次の意味です。</p>
+<div class="table-wrap"><table><thead><tr><th>部分</th><th>意味</th></tr></thead><tbody><tr><td><code>String</code></td><td>取り出す値の型。今回は文字列</td></tr><tr><td><code>word</code></td><td>取り出した1つ分の値を入れる変数</td></tr><tr><td><code>keywords</code></td><td>取り出し元の配列</td></tr></tbody></table></div>
+<p>たとえば、<code>keywords</code> に5つの文字列が入っている場合、<code>word</code> の中身は次のように変わります。</p>
+<div class="table-wrap"><table><thead><tr><th>繰り返し</th><th><code>word</code> に入る値</th></tr></thead><tbody><tr><td>1回目</td><td><code>&quot;class&quot;</code></td></tr><tr><td>2回目</td><td><code>&quot;int&quot;</code></td></tr><tr><td>3回目</td><td><code>&quot;boolean&quot;</code></td></tr><tr><td>4回目</td><td><code>&quot;if&quot;</code></td></tr><tr><td>5回目</td><td><code>&quot;while&quot;</code></td></tr></tbody></table></div>
+<h3>仕上げの考え方</h3>
+<p>この演習で一番大事なのは、次の順番です。</p>
+<div class="table-wrap"><table><thead><tr><th>順番</th><th>やること</th><th>確認すること</th></tr></thead><tbody><tr><td>1</td><td><code>String[]</code> で問題の配列を作る</td><td>5つの文字列が入っているか</td></tr><tr><td>2</td><td><code>keywords.length</code> で問題数を取得する</td><td><code>5</code> が取れるか</td></tr><tr><td>3</td><td>拡張for文で配列から1つずつ取り出す</td><td><code>word</code> に順番に値が入るか</td></tr><tr><td>4</td><td><code>System.out.println(word)</code> で表示する</td><td>5つの問題が1行ずつ表示されるか</td></tr></tbody></table></div>
+<p>配列は「複数の値をまとめて入れる箱」、拡張for文は「箱の中身を先頭から1つずつ取り出す仕組み」と考えると、流れをつかみやすくなります。</p>
 </section>
 <section class="exercise" id="演習1.2-のヒント" data-title="演習1.2 のヒント" data-group="ex1"><h2>演習1.2 のヒント</h2>
 <h3 class="point-heading">仕様確認</h3>
