@@ -340,6 +340,11 @@ for (int i = 0; i &lt; 4; i++) {
 String input = &quot;boolean&quot;;</code></pre></div>
 <p><code>keywords</code> は問題の一覧です。</p>
 <p><code>input</code> は、ユーザが入力した文字列の代わりです。今回は動作確認のために、最初から <code>&quot;boolean&quot;</code> を入れておきます。</p>
+<h3>既存コードからコピーする部分</h3>
+<p>演習2.1は、演習1.1のコードを土台にすると作りやすいです。</p>
+<div class="table-wrap"><table><thead><tr><th>コピー元</th><th>コピーしてよい部分</th><th>演習2.1で変える部分</th></tr></thead><tbody><tr><td><code>Ex1_1</code></td><td><code>String[] keywords = { ... };</code></td><td>そのまま使ってよい</td></tr><tr><td><code>Ex1_1</code></td><td><code>keywords.length</code> を使った問題数表示</td><td>そのまま使ってよい</td></tr><tr><td><code>Ex1_1</code></td><td><code>for (String word : keywords)</code></td><td>ループの中で、表示だけでなく比較も行う</td></tr></tbody></table></div>
+<p>つまり、演習1.1の「配列を用意して、1つずつ取り出す」部分はそのまま活かせます。</p>
+<p>新しく追加するのは、<code>String input = &quot;boolean&quot;;</code> と、<code>input.equals(word)</code> による比較です。</p>
 <h3>2. 文字列は <code>equals()</code> で比較する</h3>
 <p>ここが一番大事です。</p>
 <p>Javaで文字列の中身を比較するときは、<code>==</code> ではなく <code>equals()</code> を使います。</p>
@@ -379,6 +384,12 @@ String input = &quot;boolean&quot;;</code></pre></div>
 <aside class="point-box"><strong>ポイント</strong><p>ポイントは、コンストラクタの引数は3つなのに、フィールドは4つあることです。</p></aside>
 <p>4つ目の <code>score</code> フィールドは、引数として受け取るのではなく、<code>longScore</code> から作ります。</p>
 <aside class="reference">※「Java によるオブジェクト指向プログラミング」 38～41ページ を参照してください。</aside>
+<h3>既存コードからコピーする部分</h3>
+<p>演習2.2では、演習1.2で作った時間変換メソッドを再利用します。</p>
+<div class="table-wrap"><table><thead><tr><th>コピー元</th><th>コピーしてよい部分</th><th>演習2.2で置く場所</th></tr></thead><tbody><tr><td><code>Ex1_2</code></td><td><code>getStringScore(long score)</code> メソッド</td><td><code>Score</code> クラスの中</td></tr><tr><td><code>Ex1_2</code></td><td><code>msec</code>, <code>secScore</code>, <code>sec</code>, <code>minScore</code>, <code>min</code>, <code>hour</code> の計算</td><td><code>getStringScore</code> の中</td></tr><tr><td><code>Ex1_2</code></td><td><code>hour &gt; 0</code> などの条件分岐</td><td><code>getStringScore</code> の中</td></tr></tbody></table></div>
+<p>ただし、<code>main</code> メソッドはコピーしません。</p>
+<p>演習2.2で必要なのは、時間を文字列に変換する <code>getStringScore</code> メソッドだけです。</p>
+<p>また、<code>getStringScore</code> は <code>Score</code> クラスの内部で使う補助メソッドなので、<code>private static</code> にしておくとよいです。</p>
 <h3>1. <code>Score</code> クラスで持つフィールド</h3>
 <p>仕様にあるフィールドを、まず整理します。</p>
 <div class="table-wrap"><table><thead><tr><th>種類</th><th>名前</th><th>型</th><th>役割</th></tr></thead><tbody><tr><td>フィールド</td><td><code>name</code></td><td><code>String</code></td><td>入力された名前を保存する</td></tr><tr><td>フィールド</td><td><code>longScore</code></td><td><code>long</code></td><td>ミリ秒のスコアを数値のまま保存する</td></tr><tr><td>フィールド</td><td><code>date</code></td><td><code>String</code></td><td>記録日時を文字列で保存する</td></tr><tr><td>フィールド</td><td><code>score</code></td><td><code>String</code></td><td>表示用に変換したスコアを保存する</td></tr><tr><td>コンストラクタ引数</td><td><code>name</code></td><td><code>String</code></td><td><code>this.name</code> に入れる</td></tr><tr><td>コンストラクタ引数</td><td><code>longScore</code></td><td><code>long</code></td><td><code>this.longScore</code> に入れ、さらに表示用スコアの変換にも使う</td></tr><tr><td>コンストラクタ引数</td><td><code>date</code></td><td><code>String</code></td><td><code>this.date</code> に入れる</td></tr></tbody></table></div>
@@ -468,6 +479,12 @@ public String toString() {
 <div class="code-shell" data-lang="java"><div class="code-toolbar"><span>java</span><button type="button">コピー</button></div><pre><code>long now = System.currentTimeMillis();</code></pre></div>
 <p><code>static</code> が付いているので、<code>new System()</code> のようにインスタンスを作る必要はありません。</p>
 <p><code>System.currentTimeMillis()</code> と書けば、現在時刻をミリ秒で取得できます。</p>
+<h3>既存コードからコピーする部分</h3>
+<p>演習2.3の <code>Stopwatch</code> クラス本体は、新しく作るクラスです。</p>
+<p>そのため、<code>Stopwatch</code> クラスへそのままコピーする既存クラスはありません。</p>
+<p>ただし、動作確認用の <code>Ex2_3</code> では、演習1.1で使った <code>for</code> 文の考え方を使います。</p>
+<div class="table-wrap"><table><thead><tr><th>参考にするもの</th><th>使う考え方</th><th>演習2.3での使い方</th></tr></thead><tbody><tr><td><code>Ex1_1</code></td><td>繰り返し処理</td><td><code>for</code> 文で0から999まで表示する</td></tr><tr><td>演習2.3で新規作成</td><td><code>Stopwatch</code> クラス</td><td>表示処理の前後で <code>start()</code> と <code>stop()</code> を呼ぶ</td></tr></tbody></table></div>
+<p>つまり、ここでは「既存コードを丸ごとコピーする」というより、「演習1.1で学んだ繰り返し処理を、時間計測の対象にする」と考えると分かりやすいです。</p>
 <h3>4. <code>start()</code> と <code>stop()</code> で時刻を保存する</h3>
 <p><code>Stopwatch</code> クラスには、開始時刻と終了時刻を保存するフィールドを用意します。</p>
 <div class="code-shell" data-lang="java"><div class="code-toolbar"><span>java</span><button type="button">コピー</button></div><pre><code>private long start;
