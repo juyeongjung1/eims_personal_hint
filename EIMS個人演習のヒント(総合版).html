@@ -327,39 +327,77 @@ for (int i = 0; i &lt; 4; i++) {
 <p>まずは変数 <code>msec</code>, <code>sec</code>, <code>min</code>, <code>hour</code> に期待した値が入るかを確認し、その後で文字列を組み立ててください。</p>
 </section>
 <section class="exercise" id="演習2.1-のヒント" data-title="演習2.1 のヒント" data-group="ex2"><h2>演習2.1 のヒント</h2>
-<h3 class="point-heading">仕様のポイント</h3>
-<p>配列の各要素と比較対象文字列が等しいかチェックするロジックを実装します。</p>
+<h3 class="point-heading">仕様確認</h3>
+<p>この演習では、演習1.1で作った「問題の配列」を使い、入力された文字列と各問題が等しいかを確認します。</p>
+<p>タイピング練習アプリでは、ユーザが入力した文字列と、出題された問題が一致しているかを判定する必要があります。</p>
+<p>演習2.1で作る処理は、次の流れです。</p>
+<div class="table-wrap"><table><thead><tr><th>順番</th><th>やること</th><th>例</th></tr></thead><tbody><tr><td>1</td><td>問題の配列を用意する</td><td><code>&quot;class&quot;</code>, <code>&quot;int&quot;</code>, <code>&quot;boolean&quot;</code> など</td></tr><tr><td>2</td><td>比較対象の文字列を用意する</td><td><code>&quot;boolean&quot;</code></td></tr><tr><td>3</td><td>配列から問題を1つずつ取り出す</td><td><code>word</code> に1つずつ入る</td></tr><tr><td>4</td><td>比較対象と問題を比較する</td><td><code>input</code> と <code>word</code> を比べる</td></tr><tr><td>5</td><td>等しいか、等しくないかを表示する</td><td><code>等しいです</code> / <code>等しくないです</code></td></tr></tbody></table></div>
 <aside class="reference">※「Java によるオブジェクト指向プログラミング」 105～107ページ を参照してください。</aside>
-<h3 class="caution-heading">文字列比較の注意点</h3>
-<p><code>==</code> ではなく <code>equals()</code> メソッドで中身を比較しないと、常に「等しくない」と判定されてしまいます。</p>
+<h3>1. 演習1.1から増えるもの</h3>
+<p>演習1.1では、配列の中身を表示するだけでした。</p>
+<p>演習2.1では、そこに「比較対象の文字列」が増えます。</p>
+<div class="code-shell" data-lang="java"><div class="code-toolbar"><span>java</span><button type="button">コピー</button></div><pre><code>String[] keywords = { &quot;class&quot;, &quot;int&quot;, &quot;boolean&quot;, &quot;if&quot;, &quot;while&quot; };
+String input = &quot;boolean&quot;;</code></pre></div>
+<p><code>keywords</code> は問題の一覧です。</p>
+<p><code>input</code> は、ユーザが入力した文字列の代わりです。今回は動作確認のために、最初から <code>&quot;boolean&quot;</code> を入れておきます。</p>
+<h3>2. 文字列は <code>equals()</code> で比較する</h3>
+<p>ここが一番大事です。</p>
+<p>Javaで文字列の中身を比較するときは、<code>==</code> ではなく <code>equals()</code> を使います。</p>
+<div class="table-wrap"><table><thead><tr><th>書き方</th><th>意味</th><th>この演習で使うか</th></tr></thead><tbody><tr><td><code>input == word</code></td><td>同じものを指しているかを比べる</td><td>使わない</td></tr><tr><td><code>input.equals(word)</code></td><td>文字列の中身が同じかを比べる</td><td>使う</td></tr></tbody></table></div>
+<p>たとえば、<code>input</code> が <code>&quot;boolean&quot;</code>、<code>word</code> が <code>&quot;boolean&quot;</code> のとき、<code>input.equals(word)</code> は <code>true</code> になります。</p>
+<div class="code-shell" data-lang="java"><div class="code-toolbar"><span>java</span><button type="button">コピー</button></div><pre><code>if (input.equals(word)) {
+    System.out.println(&quot;等しいです&quot;);
+} else {
+    System.out.println(&quot;等しくないです&quot;);
+}</code></pre></div>
+<p><code>if</code> の条件式には、「等しいときに <code>true</code> になる式」を書きます。</p>
+<h3>3. 配列の中身を1つずつ比較する</h3>
+<p>配列の中身を1つずつ取り出すところは、演習1.1と同じです。</p>
 <div class="code-shell" data-lang="java"><div class="code-toolbar"><span>java</span><button type="button">コピー</button></div><pre><code>for (String word : keywords) {
-    System.out.print(input + &quot; と &quot; + word + &quot; は、&quot;);
-<span class="code-comment">    // ★ここがポイント：&#x27;==&#x27; ではなく equals() で中身を比較</span>
+    System.out.print(input + &quot;と&quot; + word + &quot;は、&quot;);
+
     if (input.equals(word)) {
         System.out.println(&quot;等しいです&quot;);
     } else {
         System.out.println(&quot;等しくないです&quot;);
     }
 }</code></pre></div>
-<aside class="reference">※ <code>String[] keywords = { &quot;class&quot;, &quot;int&quot;, &quot;boolean&quot;, &quot;if&quot;, &quot;while&quot; };</code> と <code>String input = &quot;boolean&quot;;</code> は事前に宣言します。</aside>
-<h3>出力例との比較</h3>
-<p>配列の長さを <code>array.length</code> で取得し、実行例の「5個の問題があります」という表示と比較結果のフォーマット（<code>boolean と class は等しくないです</code> など）が合っているか確認してください。</p>
+<p><code>System.out.print()</code> は、改行せずに表示します。</p>
+<p>その後の <code>System.out.println()</code> で「等しいです」または「等しくないです」を表示すると、実行例と同じ1行になります。</p>
+<div class="table-wrap"><table><thead><tr><th><code>word</code> の値</th><th><code>input.equals(word)</code></th><th>表示される結果</th></tr></thead><tbody><tr><td><code>&quot;class&quot;</code></td><td><code>false</code></td><td><code>booleanとclassは、等しくないです</code></td></tr><tr><td><code>&quot;int&quot;</code></td><td><code>false</code></td><td><code>booleanとintは、等しくないです</code></td></tr><tr><td><code>&quot;boolean&quot;</code></td><td><code>true</code></td><td><code>booleanとbooleanは、等しいです</code></td></tr><tr><td><code>&quot;if&quot;</code></td><td><code>false</code></td><td><code>booleanとifは、等しくないです</code></td></tr><tr><td><code>&quot;while&quot;</code></td><td><code>false</code></td><td><code>booleanとwhileは、等しくないです</code></td></tr></tbody></table></div>
+<h3>仕上げの考え方</h3>
+<p>この演習で一番大事なのは、次の順番です。</p>
+<div class="table-wrap"><table><thead><tr><th>順番</th><th>やること</th><th>確認すること</th></tr></thead><tbody><tr><td>1</td><td>問題の配列を作る</td><td>5つの文字列が入っているか</td></tr><tr><td>2</td><td>比較対象の文字列を作る</td><td>配列のどれか1つと同じ値にする</td></tr><tr><td>3</td><td><code>keywords.length</code> で問題数を表示する</td><td><code>5個の問題があります</code> と表示されるか</td></tr><tr><td>4</td><td>拡張for文で問題を1つずつ取り出す</td><td><code>word</code> に順番に値が入るか</td></tr><tr><td>5</td><td><code>input.equals(word)</code> で比較する</td><td><code>&quot;boolean&quot;</code> のときだけ等しいになるか</td></tr></tbody></table></div>
+<p>演習1.1に「文字列比較」が1つ追加された、と考えると理解しやすくなります。</p>
 </section>
 <section class="exercise" id="演習2.2-のヒント" data-title="演習2.2 のヒント" data-group="ex2"><h2>演習2.2 のヒント</h2>
-<h3 class="point-heading">仕様のポイント</h3>
-<p>以下の仕様通りに実装することが大事です。</p>
-<p>コンストラクタの引数は3つなのに、フィールドは4つありますよね。</p>
-<p>コンストラクタの引数を、そのままフィールドに代入して初期化する、今までの常識を変える必要があります。4つ目の <code>String score</code> に、何を入れるべきでしょうか。</p>
+<h3 class="point-heading">仕様確認</h3>
+<p>この演習では、タイピング結果を表す <code>Score</code> クラスを作ります。</p>
+<p>演習1.2では、ミリ秒のスコアを表示用の文字列に変換しました。</p>
+<p>演習2.2では、その処理を <code>Score</code> クラスの中に入れて、次の情報を1つのオブジェクトとして扱えるようにします。</p>
+<div class="table-wrap"><table><thead><tr><th>情報</th><th>例</th><th>役割</th></tr></thead><tbody><tr><td>名前</td><td><code>世界太郎</code></td><td>誰のスコアか</td></tr><tr><td>数値のスコア</td><td><code>123456</code></td><td>ミリ秒のまま保存する値</td></tr><tr><td>表示用スコア</td><td><code>2分3秒456</code></td><td>画面に見せるための文字列</td></tr><tr><td>日付</td><td><code>2020/01/01 12:34:56</code></td><td>いつの記録か</td></tr></tbody></table></div>
+<aside class="point-box"><strong>ポイント</strong><p>ポイントは、コンストラクタの引数は3つなのに、フィールドは4つあることです。</p></aside>
+<p>4つ目の <code>score</code> フィールドは、引数として受け取るのではなく、<code>longScore</code> から作ります。</p>
 <aside class="reference">※「Java によるオブジェクト指向プログラミング」 38～41ページ を参照してください。</aside>
-<p><code>Score</code> クラスで考えるものは、次の4つのフィールドです。コンストラクタの引数は3つですが、表示用の <code>score</code> はコンストラクタの中で作ります。</p>
+<h3>1. <code>Score</code> クラスで持つフィールド</h3>
+<p>仕様にあるフィールドを、まず整理します。</p>
 <div class="table-wrap"><table><thead><tr><th>種類</th><th>名前</th><th>型</th><th>役割</th></tr></thead><tbody><tr><td>フィールド</td><td><code>name</code></td><td><code>String</code></td><td>入力された名前を保存する</td></tr><tr><td>フィールド</td><td><code>longScore</code></td><td><code>long</code></td><td>ミリ秒のスコアを数値のまま保存する</td></tr><tr><td>フィールド</td><td><code>date</code></td><td><code>String</code></td><td>記録日時を文字列で保存する</td></tr><tr><td>フィールド</td><td><code>score</code></td><td><code>String</code></td><td>表示用に変換したスコアを保存する</td></tr><tr><td>コンストラクタ引数</td><td><code>name</code></td><td><code>String</code></td><td><code>this.name</code> に入れる</td></tr><tr><td>コンストラクタ引数</td><td><code>longScore</code></td><td><code>long</code></td><td><code>this.longScore</code> に入れ、さらに表示用スコアの変換にも使う</td></tr><tr><td>コンストラクタ引数</td><td><code>date</code></td><td><code>String</code></td><td><code>this.date</code> に入れる</td></tr></tbody></table></div>
+<p>フィールドは <code>private</code> にします。</p>
+<p>これは、クラスの外から直接値を書き換えられないようにするためです。これをカプセル化といいます。</p>
+<div class="code-shell" data-lang="java"><div class="code-toolbar"><span>java</span><button type="button">コピー</button></div><pre><code>private String name;
+private long longScore;
+private String date;
+private String score;</code></pre></div>
+<h3>2. コンストラクタで何をするか</h3>
+<p>コンストラクタでは、受け取った値をフィールドに保存します。</p>
+<p>ただし、<code>score</code> だけは少し特別です。</p>
+<p><code>score</code> は引数で受け取るのではなく、<code>longScore</code> を <code>getStringScore(longScore)</code> で変換して作ります。</p>
 <p>データの流れは、次のように考えると分かりやすいです。</p>
 <div class="code-shell" data-lang="text"><div class="code-toolbar"><span>text</span><button type="button">コピー</button></div><pre><code>longScore（数値のスコア）
     ↓ getStringScore(longScore) で変換
 score（表示用の文字列）
     ↓ toString() で名前・日付とつなげる
 世界太郎, 2分3秒456, 2020/01/01 12:34:56</code></pre></div>
-<h3>コンストラクタ実装</h3>
 <div class="code-shell" data-lang="java"><div class="code-toolbar"><span>java</span><button type="button">コピー</button></div><pre><code>public Score(String name, long longScore, String date) {
     this.name      = name;
     this.longScore = longScore;
@@ -367,13 +405,24 @@ score（表示用の文字列）
 <span class="code-comment">    // ★ここで long → String に変換して score フィールドにセット</span>
     this.score     = getStringScore(longScore);
 }</code></pre></div>
-<p>演習1.2で作成した、<code>getStringScore(longScore)</code> をコピーして、そのまま使いましょう。</p>
+<p><code>this.name</code> はフィールドの <code>name</code>、右側の <code>name</code> はコンストラクタの引数です。</p>
+<p>同じ名前なのでややこしいですが、<code>this.</code> が付いている方が「このオブジェクトが持っているフィールド」です。</p>
+<div class="table-wrap"><table><thead><tr><th>書き方</th><th>意味</th></tr></thead><tbody><tr><td><code>name</code></td><td>コンストラクタで受け取った引数</td></tr><tr><td><code>this.name</code></td><td><code>Score</code> オブジェクトが持つフィールド</td></tr></tbody></table></div>
+<h3>3. <code>getStringScore</code> は演習1.2の再利用</h3>
+<p>演習1.2で作成した <code>getStringScore(longScore)</code> を、<code>Score</code> クラスの中に移します。</p>
 <p><code>score</code> フィールドは、<code>〇時間〇分〇秒〇〇〇</code> という文字列を入れるためのフィールドです。コンストラクタの引数として受け取る値は <code>long</code> 型の数字ですが、コンストラクタの中で <code>getStringScore(longScore)</code> を呼び出す処理をすると、<code>long</code> の数字が演習1.2のように変換され、戻り値として取得されます。</p>
 <p>その戻り値を <code>score</code> フィールドに代入しておくと、出力用の文字列の値をセットできます。</p>
-<h3>getter メソッド</h3>
-<p><code>getName()</code>, <code>getLongScore()</code>, <code>getDate()</code>, <code>getScore()</code> は戻り値の型とフィールドを対応させて正しく返すこと。</p>
-<p>戻り値を間違えるとテストクラス <code>Ex2_2</code> が期待する出力とずれます。</p>
-<h3><code>toString</code> の実装</h3>
+<p>このメソッドは、<code>Score</code> クラスの内部で表示用スコアを作るために使います。</p>
+<p>そのため、外から自由に呼び出す必要はありません。<code>private</code> にして、クラスの中だけで使うメソッドにします。</p>
+<div class="code-shell" data-lang="java"><div class="code-toolbar"><span>java</span><button type="button">コピー</button></div><pre><code>private static String getStringScore(long score) {
+    // 演習1.2で作った変換処理をここに入れる
+}</code></pre></div>
+<h3>4. getter メソッドを作る</h3>
+<p>フィールドを <code>private</code> にしたので、外から値を取り出すためのメソッドを用意します。</p>
+<p>それが getter メソッドです。</p>
+<div class="table-wrap"><table><thead><tr><th>メソッド</th><th>返すフィールド</th><th>戻り値の型</th></tr></thead><tbody><tr><td><code>getName()</code></td><td><code>name</code></td><td><code>String</code></td></tr><tr><td><code>getLongScore()</code></td><td><code>longScore</code></td><td><code>long</code></td></tr><tr><td><code>getDate()</code></td><td><code>date</code></td><td><code>String</code></td></tr><tr><td><code>getScore()</code></td><td><code>score</code></td><td><code>String</code></td></tr></tbody></table></div>
+<p>戻り値を間違えると、あとでこのクラスを使うときに期待した値が取り出せなくなります。</p>
+<h3>5. <code>toString</code> で表示形式を作る</h3>
 <aside class="reference">※「Java によるオブジェクト指向プログラミング」 38～41ページ を参照してください。</aside>
 <p>実行例のように出力するために、一番簡単な方法が <code>toString</code> メソッドを再定義することです。</p>
 <div class="code-shell" data-lang="text"><div class="code-toolbar"><span>text</span><button type="button">コピー</button></div><pre><code>世界太郎, 2分3秒456, 2020/01/01 12:34:56</code></pre></div>
@@ -382,30 +431,49 @@ public String toString() {
 <span class="code-comment">    // ★カンマと空白の位置を実行例と同じに</span>
     return name + &quot;, &quot; + score + &quot;, &quot; + date;
 }</code></pre></div>
-<p>実行例の出力になるように、「<code>,</code>」と文字列を <code>+</code> でうまく設定しておけば、Main メソッドで <code>System.out.println(score);</code> をするだけで、実行例のような出力ができます。</p>
+<p><code>System.out.println(s);</code> のように <code>Score</code> オブジェクトをそのまま表示すると、Javaは自動的に <code>toString()</code> を呼び出します。</p>
+<p>そのため、<code>toString()</code> の戻り値を実行例と同じ形にしておけば、<code>System.out.println(s);</code> だけで次のように表示できます。</p>
+<div class="code-shell" data-lang="text"><div class="code-toolbar"><span>text</span><button type="button">コピー</button></div><pre><code>世界太郎, 2分3秒456, 2020/01/01 12:34:56</code></pre></div>
+<h3>仕上げの考え方</h3>
+<p>この演習で一番大事なのは、次の順番です。</p>
+<div class="table-wrap"><table><thead><tr><th>順番</th><th>やること</th><th>確認すること</th></tr></thead><tbody><tr><td>1</td><td><code>typing</code> パッケージに <code>Score</code> クラスを作る</td><td><code>package typing;</code> があるか</td></tr><tr><td>2</td><td>4つのフィールドを <code>private</code> で用意する</td><td><code>name</code>, <code>longScore</code>, <code>date</code>, <code>score</code> があるか</td></tr><tr><td>3</td><td>コンストラクタで3つの引数を受け取る</td><td>名前、数値スコア、日付を受け取れるか</td></tr><tr><td>4</td><td><code>score</code> は <code>getStringScore(longScore)</code> で作る</td><td>表示用スコアになっているか</td></tr><tr><td>5</td><td>getterを作る</td><td>各フィールドを返せるか</td></tr><tr><td>6</td><td><code>toString()</code> を作る</td><td>実行例と同じ形式で表示できるか</td></tr></tbody></table></div>
+<p>演習1.2で作った「ミリ秒を文字列に変換する処理」が、ここで <code>Score</code> クラスの一部として再利用されます。</p>
 </section>
 <section class="exercise" id="演習2.3-のヒント" data-title="演習2.3 のヒント" data-group="ex2"><h2>演習2.3 のヒント</h2>
-<h3 class="point-heading">仕様のポイント</h3>
-<p><code>Stopwatch</code> クラスは <code>start()</code>, <code>stop()</code>, <code>getLongScore()</code> の3メソッドで処理時間を計測します。</p>
-<p>現在時刻をミリ秒で取得するメソッドをAPIから調べることが大事です。</p>
+<h3 class="point-heading">仕様確認</h3>
+<p>この演習では、処理時間を測る <code>Stopwatch</code> クラスを作ります。</p>
+<p>演習1.2では「ミリ秒を表示用文字列に変換する処理」を作りました。</p>
+<p>演習2.3では、その元になる「何ミリ秒かかったか」という数値を測定します。</p>
+<p><code>Stopwatch</code> クラスでやることは、次の3つです。</p>
+<div class="table-wrap"><table><thead><tr><th>メソッド</th><th>役割</th></tr></thead><tbody><tr><td><code>start()</code></td><td>開始時刻を保存する</td></tr><tr><td><code>stop()</code></td><td>終了時刻を保存する</td></tr><tr><td><code>getLongScore()</code></td><td><code>終了時刻 - 開始時刻</code> を返す</td></tr></tbody></table></div>
 <aside class="reference">※「Java によるオブジェクト指向プログラミング」 98～102ページ を参照してください。</aside>
-<h3>1. Java API をブラウザで検索し、APIサイトに接続</h3>
+<h3>1. まず、時間計測の考え方を整理する</h3>
+<p>時間を測るときは、開始時刻と終了時刻を記録します。</p>
+<p>たとえば、次のようなイメージです。</p>
+<div class="table-wrap"><table><thead><tr><th>タイミング</th><th>保存する値</th><th>例</th></tr></thead><tbody><tr><td>処理の前</td><td><code>start</code></td><td>1000</td></tr><tr><td>処理の後</td><td><code>end</code></td><td>1032</td></tr><tr><td>かかった時間</td><td><code>end - start</code></td><td>32ミリ秒</td></tr></tbody></table></div>
+<p>つまり、処理時間は <code>end - start</code> で求めます。</p>
+<h3>2. Java API で <code>System</code> クラスを調べる</h3>
 <p>ブラウザで <code>java api</code> と検索し、Oracle の Java API ドキュメントを開きます。</p>
 <div class="table-wrap"><table><thead><tr><th>操作</th><th>見る場所</th><th>確認すること</th></tr></thead><tbody><tr><td><code>java api</code> と検索する</td><td>検索結果</td><td>Oracle の Java API ドキュメントを選ぶ</td></tr><tr><td>APIページを開く</td><td>ページ上部または右上</td><td>クラス検索欄を探す</td></tr><tr><td>日本語表示にしたい場合</td><td>ブラウザ翻訳</td><td>メソッド説明を読みやすくする</td></tr></tbody></table></div>
-<h3>2. 右上の検索バーに、調べたいクラス（今回は <code>System</code>）を検索し、クリックする</h3>
 <p>APIページの検索欄へ <code>System</code> と入力し、候補に出る <code>java.lang.System</code> を選択します。</p>
+<p>探したいのは、現在時刻をミリ秒で取得するメソッドです。</p>
 <div class="code-shell" data-lang="text"><div class="code-toolbar"><span>text</span><button type="button">コピー</button></div><pre><code>検索欄に入力する文字: System
 選択する候補: java.lang.System
 探したいメソッド: currentTimeMillis()</code></pre></div>
-<h3>3. メソッドの概要を探せば、すぐ見つかる</h3>
+<h3>3. <code>currentTimeMillis()</code> をコードで使う</h3>
 <p>ブラウザの翻訳Onを推奨します。</p>
 <p><code>System</code> クラスのメソッド一覧で、<code>currentTimeMillis()</code> を探します。次の点を確認してください。</p>
 <div class="table-wrap"><table><thead><tr><th>見るポイント</th><th>意味</th></tr></thead><tbody><tr><td><code>static</code></td><td>インスタンスを作らず、<code>System.currentTimeMillis()</code> と呼び出せる</td></tr><tr><td>戻り値 <code>long</code></td><td>ミリ秒の時刻は <code>long</code> 型で受け取る</td></tr><tr><td>メソッド名 <code>currentTimeMillis()</code></td><td>現在時刻をミリ秒で取得する</td></tr></tbody></table></div>
 <p>APIで見つけた情報をコードに直すと、次の1行になります。</p>
 <div class="code-shell" data-lang="java"><div class="code-toolbar"><span>java</span><button type="button">コピー</button></div><pre><code>long now = System.currentTimeMillis();</code></pre></div>
-<p><code>static</code> が付いているので、呼び出す時は、<code>System.currentTimeMillis();</code> と呼び出さないといけないこともわかります。</p>
-<p>あとは、仕様通りに、<code>Stopwatch</code> クラスを定義しましょう。</p>
-<h3>時刻取得メソッド</h3>
+<p><code>static</code> が付いているので、<code>new System()</code> のようにインスタンスを作る必要はありません。</p>
+<p><code>System.currentTimeMillis()</code> と書けば、現在時刻をミリ秒で取得できます。</p>
+<h3>4. <code>start()</code> と <code>stop()</code> で時刻を保存する</h3>
+<p><code>Stopwatch</code> クラスには、開始時刻と終了時刻を保存するフィールドを用意します。</p>
+<div class="code-shell" data-lang="java"><div class="code-toolbar"><span>java</span><button type="button">コピー</button></div><pre><code>private long start;
+private long end;</code></pre></div>
+<p><code>start()</code> では、現在時刻を <code>start</code> フィールドに保存します。</p>
+<p><code>stop()</code> では、現在時刻を <code>end</code> フィールドに保存します。</p>
 <div class="code-shell" data-lang="java"><div class="code-toolbar"><span>java</span><button type="button">コピー</button></div><pre><code>public void start() {
 <span class="code-comment">    // ★開始時刻をミリ秒で取得</span>
     start = System.currentTimeMillis();
@@ -415,17 +483,32 @@ public void stop() {
 <span class="code-comment">    // ★終了時刻をミリ秒で取得</span>
     end = System.currentTimeMillis();
 }</code></pre></div>
-<h3>経過時間の計算</h3>
+<h3>5. 経過時間を計算する</h3>
 <div class="code-shell" data-lang="java"><div class="code-toolbar"><span>java</span><button type="button">コピー</button></div><pre><code>public long getLongScore() {
 <span class="code-comment">    // ★end - start の符号ミスに注意</span>
     return end - start;
 }</code></pre></div>
-<aside class="caution-box"><strong>注意</strong><p><code>end - start</code> の差分を <code>long</code> 型で返す <code>getLongScore()</code> の実装が重要です。符号ミスや型キャストに注意してください。</p></aside>
-<aside class="reference">※テストクラスでは <code>start()</code> → 処理 → <code>stop()</code> → <code>getLongScore()</code> の順で呼ぶことを想定しています。</aside>
-<h3>動作確認のコツ</h3>
+<p><code>getLongScore()</code> では、<code>end - start</code> を返します。</p>
+<aside class="caution-box"><strong>注意</strong><p><code>start - end</code> にするとマイナスの値になってしまうので、順番に注意してください。</p></aside>
+<div class="table-wrap"><table><thead><tr><th>式</th><th>結果</th></tr></thead><tbody><tr><td><code>end - start</code></td><td>正しい。かかった時間になる</td></tr><tr><td><code>start - end</code></td><td>間違い。マイナスになりやすい</td></tr></tbody></table></div>
+<h3>6. <code>Ex2_3</code> で動作確認する</h3>
 <p><code>Ex2_3</code> の <code>main</code> で「0～999を出力するのに何ミリ秒かかったか」を測定します。</p>
-<ol><li><code>start</code> メソッドを実行</li><li><code>for</code> 文で0～1000回繰り返し数字を出力</li><li><code>end</code> メソッドを実行</li><li><code>getLongScore()</code> を実行すれば、2でかかったミリ秒を取得できるので、出力します。</li></ol>
-<p>ループを止める場所や <code>stop()</code> を呼ぶタイミングを見落とさないようにして、出力例と同じフォーマットになっているか確かめてください。</p>
+<p>呼び出す順番は、次の通りです。</p>
+<div class="table-wrap"><table><thead><tr><th>順番</th><th>やること</th><th>目的</th></tr></thead><tbody><tr><td>1</td><td><code>Stopwatch</code> のインスタンスを作る</td><td>時間を測る道具を用意する</td></tr><tr><td>2</td><td><code>start()</code> を呼ぶ</td><td>測定開始</td></tr><tr><td>3</td><td><code>for</code> 文で0～999を表示する</td><td>測定したい処理</td></tr><tr><td>4</td><td><code>stop()</code> を呼ぶ</td><td>測定終了</td></tr><tr><td>5</td><td><code>getLongScore()</code> を呼ぶ</td><td>かかったミリ秒を取得する</td></tr></tbody></table></div>
+<div class="code-shell" data-lang="java"><div class="code-toolbar"><span>java</span><button type="button">コピー</button></div><pre><code>Stopwatch s = new Stopwatch();
+s.start();
+
+// ここに、時間を測りたい処理を書く
+
+s.stop();
+System.out.println(s.getLongScore() + &quot;ミリ秒&quot;);</code></pre></div>
+<p><code>stop()</code> を呼ぶ位置が早すぎると、測りたい処理が含まれません。</p>
+<p>逆に、<code>stop()</code> の後に測りたい処理を書いても、その処理時間は測定されません。</p>
+<h3>仕上げの考え方</h3>
+<p>この演習で一番大事なのは、次の順番です。</p>
+<div class="table-wrap"><table><thead><tr><th>順番</th><th>やること</th><th>確認すること</th></tr></thead><tbody><tr><td>1</td><td><code>typing</code> パッケージに <code>Stopwatch</code> クラスを作る</td><td><code>package typing;</code> があるか</td></tr><tr><td>2</td><td><code>start</code> と <code>end</code> フィールドを用意する</td><td>どちらも <code>long</code> 型か</td></tr><tr><td>3</td><td><code>start()</code> で開始時刻を保存する</td><td><code>start</code> に現在時刻が入るか</td></tr><tr><td>4</td><td><code>stop()</code> で終了時刻を保存する</td><td><code>end</code> に現在時刻が入るか</td></tr><tr><td>5</td><td><code>getLongScore()</code> で差分を返す</td><td><code>end - start</code> になっているか</td></tr><tr><td>6</td><td><code>Ex2_3</code> で呼び出す</td><td><code>start()</code> → 処理 → <code>stop()</code> の順か</td></tr></tbody></table></div>
+<p>演習2.2の <code>Score</code> は「スコア情報を保存するクラス」、演習2.3の <code>Stopwatch</code> は「スコアの元になる時間を測るクラス」です。</p>
+<p>この2つが後のタイピングアプリで組み合わさっていきます。</p>
 </section>
 <section class="exercise" id="演習3.1-のヒント" data-title="演習3.1 のヒント" data-group="ex3"><h2>演習3.1 のヒント</h2>
 <h3 class="point-heading">仕様のポイント</h3>
