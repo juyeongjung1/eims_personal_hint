@@ -187,63 +187,97 @@ figcaption { font-size: 13px; color: var(--muted); padding: 8px 12px; border-top
 </section>
 <section class="exercise" id="演習1.2-のヒント" data-title="演習1.2 のヒント" data-group="ex1"><h2>演習1.2 のヒント</h2>
 <h3 class="point-heading">仕様確認</h3>
-<p>「ミリ秒のスコアを…『○時間×分△秒□□□』という形式の文字列に変換」とあることを再確認してください。</p>
+<p>この演習では、ミリ秒で表された処理時間を、人が読みやすい文字列に変換します。</p>
+<p>たとえば <code>12345678</code> ミリ秒をそのまま表示しても、どれくらいの時間なのかすぐには分かりません。</p>
+<p>そこで、次のように変換します。</p>
+<div class="code-shell" data-lang="text"><div class="code-toolbar"><span>text</span><button type="button">コピー</button></div><pre><code>12345678ミリ秒 → 3時間25分45秒678</code></pre></div>
+<p>問題文では、<code>getStringScore(long score)</code> というメソッドを作り、ミリ秒の値を「○時間×分△秒□□□」形式の文字列にして返すことが求められています。</p>
 <aside class="reference">※「アルゴリズム演習」 演習1.3 の問題と似ています。</aside>
-<h3>1. <code>getStringScore</code> で変換しないといけない理由</h3>
-<p>ミリ秒（ms）だけの大きな数値をそのまま表示しても、何時間何分何秒なのかイメージしづらいですよね。</p>
-<p>そこで「時間」「分」「秒」「ミリ秒」の4つの単位に分解し、読みやすい文字列に変換するのが目的です。</p>
-<h3>2. 「余り」と「商」を分ける理由</h3>
-<p>プログラムでは「余りを取ると小さい単位が得られ、商を取ると大きい単位に切り替わる」という法則を使います。</p>
+<h3>1. まず、<code>getStringScore</code> の役割を整理する</h3>
+<p>いきなりコードを書き始める前に、このメソッドが何をするものなのかを分けて考えましょう。</p>
+<p><code>getStringScore(long score)</code> の役割は、次の2つです。</p>
+<div class="table-wrap"><table><thead><tr><th>役割</th><th>内容</th></tr></thead><tbody><tr><td>単位に分ける</td><td><code>score</code> を「時間」「分」「秒」「ミリ秒」に分解する</td></tr><tr><td>文字列にする</td><td><code>0</code> の単位を省略しながら、表示用の文字列を作る</td></tr></tbody></table></div>
+<aside class="point-box"><strong>ポイント</strong><p>ポイントは、計算と表示を一度に考えないことです。</p></aside>
+<p>まずは数字を分解します。そのあとで、分解した数字を使って文字列を作ります。</p>
+<h3>2. 「余り」と「商」を使って単位を分ける</h3>
+<p>ミリ秒を時間・分・秒・ミリ秒に分けるには、割り算 <code>/</code> と余り <code>%</code> を使います。</p>
 <ul><li>余り（<code>%</code>）: 小さい単位だけを取り出す</li><li>商（<code>/</code>）: 大きい単位にまとめる</li></ul>
-<p>このルールに従い、段階的に計算します。</p>
-<h3>3. 各変数の役割と“なぜここに代入するのか”</h3>
-<div class="code-shell" data-lang="java"><div class="code-toolbar"><span>java</span><button type="button">コピー</button></div><pre><code>long msec = score % 1000;       // ①：1000で割った余り → “ミリ秒だけ”を取り出す
-long secScore = score / 1000;   // ②：ミリ秒分を除外した秒の値を取っておく
-long sec = secScore % 60;       // ③：60で割った余り → “1分未満の秒”を取り出す
-long minScore = secScore / 60;  // ④：全体を分に変換 → “秒”という単位をまとめる
-long min = minScore % 60;       // ⑤：60で割った余り → “1時間未満の分”を取り出す
-long hour = minScore / 60;      // ⑥：残った商 → “時間”を取得
+<p>たとえば、<code>12345</code> ミリ秒を考えます。</p>
+<p><code>12345 % 1000</code> は <code>345</code> です。これは「1000ミリ秒で割り切れずに残った部分」なので、ミリ秒部分になります。</p>
+<p><code>12345 / 1000</code> は <code>12</code> です。これは「全体を秒に直した値」になります。</p>
+<p>このように、<code>%</code> は今見ている単位の残りを取り出すために使い、<code>/</code> は次の大きな単位へ進むために使います。</p>
+<h3>3. 各変数の役割を確認する</h3>
+<p>計算は、ミリ秒 → 秒 → 分 → 時間の順番で進めると考えやすいです。</p>
+<div class="code-shell" data-lang="java"><div class="code-toolbar"><span>java</span><button type="button">コピー</button></div><pre><code>long msec = score % 1000;       // ① 1000で割った余り → ミリ秒部分
+long secScore = score / 1000;   // ② 全体を秒に直した値
 
-// 以降、hour/min/sec/msec を組み合わせて文字列を作る</code></pre></div>
-<p class="lead-label">①で <code>msec</code> に入れておく理由:</p>
-<ul><li><code>score % 1000</code> を直接次の行で使うと式が長く、何をしているか分かりづらい。</li><li>一時変数 <code>msec</code> に名前を付けることで「これはミリ秒部分ですよ」と明示できる。</li></ul>
-<p class="lead-label">②で <code>secScore</code> に入れておく理由:</p>
-<ul><li>以降の「秒→分」「分→時間」の計算に何度も使うため、一度まとめておく。</li><li>もし <code>score / 1000</code> を毎回書いたらミスや読み間違いの原因になります。</li></ul>
-<p class="lead-label">③～⑥の流れ:</p>
-<ul><li><code>secScore % 60</code>: 1分未満の「残り秒」を得る</li><li><code>secScore / 60</code>: 全体の「何分か」を得て、さらにそれを60で割り分ける</li><li>それぞれ別の変数に代入することで、「ここでは秒を、次では分を…」と段階を追って確認できる</li></ul>
-<p><code>12345678</code> ミリ秒は、3時間25分45秒678です。</p>
+long sec = secScore % 60;       // ③ 60で割った余り → 秒部分
+long minScore = secScore / 60;  // ④ 全体を分に直した値
+
+long min = minScore % 60;       // ⑤ 60で割った余り → 分部分
+long hour = minScore / 60;      // ⑥ 残った商 → 時間部分</code></pre></div>
+<p>ここで大切なのは、途中の値にも名前を付けていることです。</p>
+<p>たとえば、<code>secScore</code> は「全体を秒に直した値」です。<code>minScore</code> は「全体を分に直した値」です。</p>
+<p>このように一時変数を使うと、「今はどの単位で考えているのか」が分かりやすくなります。</p>
+<p><code>score / 1000 / 60</code> のように式を長くつなげることもできますが、初心者のうちは途中の値を変数に入れて、1段階ずつ確認する方が安全です。</p>
+<p><code>12345678</code> ミリ秒の場合、各変数の値は次のようになります。</p>
 <div class="table-wrap"><table><thead><tr><th>変数名</th><th>計算式</th><th>値</th><th>解説</th></tr></thead><tbody><tr><td><code>msec</code></td><td><code>score % 1000</code></td><td>678</td><td>1000で割った余り → 「ミリ秒部分」だけ取り出す</td></tr><tr><td><code>secScore</code></td><td><code>score / 1000</code></td><td>12345</td><td>3時間25分45秒分を、秒の単位で取っておく</td></tr><tr><td><code>sec</code></td><td><code>secScore % 60</code></td><td>45</td><td>60で割った余り → 「1分未満の秒」だけ取り出す</td></tr><tr><td><code>minScore</code></td><td><code>secScore / 60</code></td><td>205</td><td>残った3時間25分を、分単位で取っておく</td></tr><tr><td><code>min</code></td><td><code>minScore % 60</code></td><td>25</td><td>60で割った余り → 「1時間未満の分」だけ取り出す</td></tr><tr><td><code>hour</code></td><td><code>minScore / 60</code></td><td>3</td><td>残った3時間を、時間単位で取っておく</td></tr></tbody></table></div>
-<h3>4. 文字列出力の条件文</h3>
-<p>上記の仕様を実現するためには、変換が終わったからと言って、そのまま出力してはいけません。出力する際に、条件文を使ってください。</p>
+<h3>4. 0の単位は表示しない</h3>
+<p>単位に分けられたら、次は文字列を作ります。</p>
+<p>ただし、問題文には「各単位の値が0の部分を含まない文字列」とあります。</p>
+<p>つまり、計算した値を全部そのままつなげてはいけません。</p>
 <p>たとえば <code>score = 123456</code>（約2分）を変換すると、次のようになります。</p>
 <ul><li><code>hour = 0</code> → 「0時間」は不要</li><li><code>min = 2</code> → 「2分」だけは表示したい</li></ul>
-<p>もし、<code>if (hour &gt; 0)</code> の条件がないと、「0時間2分…」となってしまいます。</p>
+<p>もし <code>if (hour &gt; 0)</code> の条件がないと、「0時間2分3秒456」のように、不要な <code>0時間</code> が表示されてしまいます。</p>
 <div class="code-shell" data-lang="text"><div class="code-toolbar"><span>text</span><button type="button">コピー</button></div><pre><code>12345678 ミリ秒は、3時間25分45秒678
 1234567 ミリ秒は、20分34秒567      ← hour=0 ⇒ 「時間」部分をスキップ
 123456 ミリ秒は、2分3秒456          ← hour=0, secScore=123 ⇒ 「秒」も残る
 12345 ミリ秒は、12秒345             ← hour=0, min=0 ⇒ 「分」をスキップ</code></pre></div>
 <p>出力する・しないの判断は、次のように整理できます。</p>
 <div class="table-wrap"><table><thead><tr><th>単位</th><th>変数</th><th>表示する条件</th><th>表示例</th></tr></thead><tbody><tr><td>時間</td><td><code>hour</code></td><td><code>hour &gt; 0</code> のときだけ</td><td><code>3時間</code></td></tr><tr><td>分</td><td><code>min</code></td><td><code>min &gt; 0</code> のときだけ</td><td><code>25分</code></td></tr><tr><td>秒</td><td><code>sec</code></td><td><code>sec &gt; 0</code> のときだけ</td><td><code>45秒</code></td></tr><tr><td>ミリ秒</td><td><code>msec</code></td><td><code>msec &gt; 0</code> のときだけ</td><td><code>678</code></td></tr></tbody></table></div>
-<aside class="point-box"><strong>ポイント</strong><p>ポイントは「0の単位は表示しない」ことです。先頭から順番に、時間、分、秒、ミリ秒を必要なときだけ文字列へ追加していきます。</p></aside>
+<aside class="point-box"><strong>ポイント</strong><p>ポイントは、先頭から順番に「必要な単位だけ」を文字列へ追加していくことです。</p></aside>
 <div class="code-shell" data-lang="text"><div class="code-toolbar"><span>text</span><button type="button">コピー</button></div><pre><code>hour が 0 より大きい？ → はい：時間を追加 / いいえ：何もしない
 min  が 0 より大きい？ → はい：分を追加   / いいえ：何もしない
 sec  が 0 より大きい？ → はい：秒を追加   / いいえ：何もしない
 msec が 0 より大きい？ → はい：ミリ秒を追加 / いいえ：何もしない</code></pre></div>
-<h3>文字列の組み立て</h3>
-<div class="code-shell" data-lang="java"><div class="code-toolbar"><span>java</span><button type="button">コピー</button></div><pre><code>if (hour &gt; 0) {
-    strScore = hour + &quot;時間&quot;;
-}</code></pre></div>
-<p>など、「～～が0より大きい場合のみ追加する」条件分岐を、単位ごと用意して出力してください。</p>
-<h3>5. Main メソッドですること</h3>
-<p>繰り返しを用いる理由は、出力の条件文がちゃんと実装できたのかを確認するためです。</p>
-<p><code>12345678</code> ミリ秒を、どんどん10で割っていくと、小さい単位までテストできます。</p>
-<div class="code-shell" data-lang="java"><div class="code-toolbar"><span>java</span><button type="button">コピー</button></div><pre><code>for (int i = 0; i &lt; 4; i++) {
+<p>文字列を作るときは、最初に空文字を用意して、条件に合う単位だけ追加します。</p>
+<div class="code-shell" data-lang="java"><div class="code-toolbar"><span>java</span><button type="button">コピー</button></div><pre><code>String strScore = &quot;&quot;;
+
+if (hour &gt; 0) {
+    strScore += hour + &quot;時間&quot;;
+}
+
+if (min &gt; 0) {
+    strScore += min + &quot;分&quot;;
+}
+
+// 秒、ミリ秒も同じ考え方で追加する</code></pre></div>
+<p><code>+=</code> は、今ある文字列の後ろに文字を追加する書き方です。</p>
+<p>最初は <code>strScore</code> が空なので、時間があれば時間を追加し、分があればその後ろに分を追加します。</p>
+<h3>5. <code>main</code> メソッドですること</h3>
+<p><code>main</code> メソッドでは、<code>getStringScore</code> が正しく動くかを確認します。</p>
+<p>問題文では、繰り返しを用いて、引数の値を10分の1にしながら複数回 <code>getStringScore</code> を呼び出すように指定されています。</p>
+<div class="code-shell" data-lang="java"><div class="code-toolbar"><span>java</span><button type="button">コピー</button></div><pre><code>long score = 12345678;
+
+for (int i = 0; i &lt; 4; i++) {
     System.out.println(score + &quot;ミリ秒は、&quot; + getStringScore(score));
     score /= 10;
 }</code></pre></div>
-<p>この <code>for</code> 文は、同じメソッドをいろいろな桁のスコアで試すための確認用です。</p>
+<p>この <code>for</code> 文は、同じメソッドをいろいろな大きさのスコアで試すための確認用です。</p>
+<p><code>score /= 10;</code> は、<code>score = score / 10;</code> と同じ意味です。</p>
+<p>毎回スコアを小さくすることで、時間が出る場合、時間が出ない場合、分が出ない場合などをまとめて確認できます。</p>
 <div class="table-wrap"><table><thead><tr><th>繰り返し</th><th>表示に使う <code>score</code></th><th>確認したいこと</th></tr></thead><tbody><tr><td>1回目</td><td><code>12345678</code></td><td>時間・分・秒・ミリ秒がすべて出るか</td></tr><tr><td>2回目</td><td><code>1234567</code></td><td>時間が0のとき、時間を出さないか</td></tr><tr><td>3回目</td><td><code>123456</code></td><td>分・秒・ミリ秒だけで表示できるか</td></tr><tr><td>4回目</td><td><code>12345</code></td><td>分が0のとき、分を出さないか</td></tr></tbody></table></div>
-<p>毎回 <code>score /= 10;</code> で値を小さくするので、表示条件が正しく動いているかをまとめて確認できます。</p>
+<h3>仕上げの考え方</h3>
+<p>この演習で一番大事なのは、次の順番です。</p>
+<div class="code-shell" data-lang="text"><div class="code-toolbar"><span>text</span><button type="button">コピー</button></div><pre><code>1. ミリ秒から、ミリ秒部分を取り出す
+2. 全体を秒に直す
+3. 秒部分を取り出す
+4. 全体を分に直す
+5. 分部分を取り出す
+6. 残った値を時間として扱う
+7. 0ではない単位だけを文字列に追加する</code></pre></div>
+<p>一気に完成させようとすると難しく見えますが、やっていることは「単位を1つずつ分ける」「必要なものだけ表示する」の2つです。</p>
+<p>まずは変数 <code>msec</code>, <code>sec</code>, <code>min</code>, <code>hour</code> に期待した値が入るかを確認し、その後で文字列を組み立ててください。</p>
 </section>
 <section class="exercise" id="演習2.1-のヒント" data-title="演習2.1 のヒント" data-group="ex2"><h2>演習2.1 のヒント</h2>
 <h3 class="point-heading">仕様のポイント</h3>
