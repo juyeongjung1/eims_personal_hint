@@ -20,6 +20,34 @@ RELEASE_SCHEDULE = {
     "ex5": "",
 }
 
+JAVA_KEYWORDS = {
+    "package",
+    "import",
+    "public",
+    "private",
+    "protected",
+    "class",
+    "static",
+    "void",
+    "int",
+    "long",
+    "boolean",
+    "if",
+    "else",
+    "for",
+    "while",
+    "return",
+    "new",
+    "try",
+    "catch",
+    "break",
+    "true",
+    "false",
+    "null",
+}
+JAVA_CONTROL_WORDS = {"if", "for", "while", "switch", "catch"}
+JAVA_TOKEN_PATTERN = re.compile(r'"(?:\\.|[^"\\])*"|//.*|\b\d+\b|\b[A-Za-z_][A-Za-z0-9_]*\b|\s+|.')
+
 
 def slugify(text: str, index: int) -> str:
     token = re.sub(r"[^\w一-龯ぁ-んァ-ヶー.]+", "-", text, flags=re.UNICODE).strip("-")
@@ -79,15 +107,59 @@ def long_division_html(code: str) -> str:
     )
 
 
+def span(class_name: str, text: str) -> str:
+    return f'<span class="{class_name}">{html.escape(text)}</span>'
+
+
+def next_code_token(tokens: list[str], index: int) -> str:
+    for token in tokens[index + 1 :]:
+        if not token.isspace():
+            return token
+    return ""
+
+
+def highlight_java_line(line: str) -> str:
+    tokens = JAVA_TOKEN_PATTERN.findall(line)
+    highlighted = []
+
+    for index, token in enumerate(tokens):
+        if token == "____":
+            highlighted.append('<span class="blank">____</span>')
+        elif token.startswith("//"):
+            highlighted.append(span("tok-comment", token))
+        elif token.startswith('"'):
+            highlighted.append(span("tok-string", token))
+        elif token.isdigit():
+            highlighted.append(span("tok-number", token))
+        elif re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", token):
+            next_token = next_code_token(tokens, index)
+            if token in JAVA_KEYWORDS:
+                highlighted.append(span("tok-keyword", token))
+            elif next_token == "(" and token not in JAVA_CONTROL_WORDS:
+                highlighted.append(span("tok-method", token))
+            elif token[0].isupper():
+                highlighted.append(span("tok-class", token))
+            else:
+                highlighted.append(span("tok-variable", token))
+        else:
+            highlighted.append(html.escape(token))
+
+    return "".join(highlighted)
+
+
 def code_html(code: str, lang: str) -> str:
     if lang == "longdivision":
         return long_division_html(code)
 
     escaped_lines = []
-    for line in html.escape(code.rstrip("\n")).splitlines():
-        line = line.replace("____", '<span class="blank">____</span>')
+    is_java = lang.lower() == "java"
+    for raw_line in code.rstrip("\n").splitlines():
+        if is_java:
+            line = highlight_java_line(raw_line)
+        else:
+            line = html.escape(raw_line).replace("____", '<span class="blank">____</span>')
         stripped = line.strip()
-        if stripped.startswith("// ★") or stripped.startswith("// ヒント"):
+        if raw_line.strip().startswith("// ★") or raw_line.strip().startswith("// ヒント"):
             line = f'<span class="code-comment">{line}</span>'
         escaped_lines.append(line)
     escaped = "\n".join(escaped_lines)
@@ -396,6 +468,13 @@ pre {{
   display: inline-block; width: 100%; color: #6f4e00; background: #fff7df;
   border-left: 4px solid #e3b341; padding-left: 8px; margin-left: -8px;
 }}
+.tok-keyword {{ color: #7c3aed; font-weight: 700; }}
+.tok-class {{ color: #0f766e; font-weight: 700; }}
+.tok-method {{ color: #1d4ed8; font-weight: 700; }}
+.tok-variable {{ color: #9a3412; }}
+.tok-string {{ color: #15803d; }}
+.tok-number {{ color: #b45309; }}
+.tok-comment {{ color: #687076; font-style: italic; }}
 .blank {{
   background: #ffe08a; color: #241600; border: 1px solid #c88a00;
   border-radius: 4px; padding: 0 4px; font-weight: 800;
