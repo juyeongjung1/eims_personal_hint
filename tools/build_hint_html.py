@@ -73,7 +73,7 @@ def long_division_html(code: str) -> str:
         '<div class="division-explain">'
         f'<p class="division-formula">{formula}</p>'
         f'<p>{note}</p>'
-        '<p>つまり、商の <code>12</code> は「全体を秒に直した値」、余りの <code>345</code> は「ミリ秒部分」です。</p>'
+        '<p>つまり、商の <code>12</code> は「何秒分あるか」、余りの <code>345</code> は「ミリ秒部分」です。</p>'
         '</div>'
         '</div>'
     )

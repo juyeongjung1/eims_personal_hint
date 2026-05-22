@@ -230,25 +230,25 @@ figcaption { font-size: 13px; color: var(--muted); padding: 8px 12px; border-top
 <ul><li>余り（<code>%</code>）: 小さい単位だけを取り出す</li><li>商（<code>/</code>）: 大きい単位にまとめる</li></ul>
 <p>たとえば、<code>12345</code> ミリ秒を考えます。</p>
 <p><code>12345 % 1000</code> は <code>345</code> です。これは「1000ミリ秒で割り切れずに残った部分」なので、ミリ秒部分になります。</p>
-<p><code>12345 / 1000</code> は <code>12</code> です。これは「全体を秒に直した値」になります。</p>
-<div class="division-card"><div class="division-figure" role="img" aria-label="12345 割る 1000 は 12 あまり 345"><div class="division-quotient">12</div><div class="division-row"><span class="division-divisor">1000</span><span class="division-bracket"><span>12345</span></span></div><div class="division-product">12000</div><div class="division-line"></div><div class="division-remainder">345</div></div><div class="division-explain"><p class="division-formula">12345 ÷ 1000 = 12 あまり 345</p><p><code>12345 % 1000</code> は、この筆算の「あまり」である <code>345</code> を取り出す計算です。</p><p>つまり、商の <code>12</code> は「全体を秒に直した値」、余りの <code>345</code> は「ミリ秒部分」です。</p></div></div>
+<p><code>12345 / 1000</code> は <code>12</code> です。これは「12345ミリ秒の中に、1秒が12個入っている」という意味です。</p>
+<div class="division-card"><div class="division-figure" role="img" aria-label="12345 割る 1000 は 12 あまり 345"><div class="division-quotient">12</div><div class="division-row"><span class="division-divisor">1000</span><span class="division-bracket"><span>12345</span></span></div><div class="division-product">12000</div><div class="division-line"></div><div class="division-remainder">345</div></div><div class="division-explain"><p class="division-formula">12345 ÷ 1000 = 12 あまり 345</p><p><code>12345 % 1000</code> は、この筆算の「あまり」である <code>345</code> を取り出す計算です。</p><p>つまり、商の <code>12</code> は「何秒分あるか」、余りの <code>345</code> は「ミリ秒部分」です。</p></div></div>
 <p>このように、<code>%</code> は今見ている単位の残りを取り出すために使い、<code>/</code> は次の大きな単位へ進むために使います。</p>
 <h3>3. 各変数の役割を確認する</h3>
 <p>計算は、ミリ秒 → 秒 → 分 → 時間の順番で進めると考えやすいです。</p>
 <div class="code-shell" data-lang="java"><div class="code-toolbar"><span>java</span><button type="button">コピー</button></div><pre><code>long msec = score % 1000;       // ① 1000で割った余り → ミリ秒部分
-long secScore = score / 1000;   // ② 全体を秒に直した値
+long secScore = score / 1000;   // ② 何秒分あるか
 
 long sec = secScore % 60;       // ③ 60で割った余り → 秒部分
-long minScore = secScore / 60;  // ④ 全体を分に直した値
+long minScore = secScore / 60;  // ④ 何分ぶんあるか
 
 long min = minScore % 60;       // ⑤ 60で割った余り → 分部分
 long hour = minScore / 60;      // ⑥ 残った商 → 時間部分</code></pre></div>
 <p>ここで大切なのは、途中の値にも名前を付けていることです。</p>
-<p>たとえば、<code>secScore</code> は「全体を秒に直した値」です。<code>minScore</code> は「全体を分に直した値」です。</p>
+<p>たとえば、<code>secScore</code> は「何秒分あるか」を表す値です。<code>minScore</code> は「何分ぶんあるか」を表す値です。</p>
 <p>このように一時変数を使うと、「今はどの単位で考えているのか」が分かりやすくなります。</p>
 <p><code>score / 1000 / 60</code> のように式を長くつなげることもできますが、初心者のうちは途中の値を変数に入れて、1段階ずつ確認する方が安全です。</p>
 <p><code>12345678</code> ミリ秒の場合、各変数の値は次のようになります。</p>
-<div class="table-wrap"><table><thead><tr><th>変数名</th><th>計算式</th><th>値</th><th>解説</th></tr></thead><tbody><tr><td><code>msec</code></td><td><code>score % 1000</code></td><td>678</td><td>1000で割った余り → 「ミリ秒部分」だけ取り出す</td></tr><tr><td><code>secScore</code></td><td><code>score / 1000</code></td><td>12345</td><td>3時間25分45秒分を、秒の単位で取っておく</td></tr><tr><td><code>sec</code></td><td><code>secScore % 60</code></td><td>45</td><td>60で割った余り → 「1分未満の秒」だけ取り出す</td></tr><tr><td><code>minScore</code></td><td><code>secScore / 60</code></td><td>205</td><td>残った3時間25分を、分単位で取っておく</td></tr><tr><td><code>min</code></td><td><code>minScore % 60</code></td><td>25</td><td>60で割った余り → 「1時間未満の分」だけ取り出す</td></tr><tr><td><code>hour</code></td><td><code>minScore / 60</code></td><td>3</td><td>残った3時間を、時間単位で取っておく</td></tr></tbody></table></div>
+<div class="table-wrap"><table><thead><tr><th>変数名</th><th>計算式</th><th>値</th><th>解説</th></tr></thead><tbody><tr><td><code>msec</code></td><td><code>score % 1000</code></td><td>678</td><td>1000で割った余り → 「ミリ秒部分」だけ取り出す</td></tr><tr><td><code>secScore</code></td><td><code>score / 1000</code></td><td>12345</td><td>12345秒ぶんあることを表す</td></tr><tr><td><code>sec</code></td><td><code>secScore % 60</code></td><td>45</td><td>60で割った余り → 「1分未満の秒」だけ取り出す</td></tr><tr><td><code>minScore</code></td><td><code>secScore / 60</code></td><td>205</td><td>205分ぶんあることを表す</td></tr><tr><td><code>min</code></td><td><code>minScore % 60</code></td><td>25</td><td>60で割った余り → 「1時間未満の分」だけ取り出す</td></tr><tr><td><code>hour</code></td><td><code>minScore / 60</code></td><td>3</td><td>残った3時間を、時間単位で取っておく</td></tr></tbody></table></div>
 <h3>4. 0の単位は表示しない</h3>
 <p>単位に分けられたら、次は文字列を作ります。</p>
 <p>ただし、問題文には「各単位の値が0の部分を含まない文字列」とあります。</p>
@@ -296,13 +296,7 @@ for (int i = 0; i &lt; 4; i++) {
 <div class="table-wrap"><table><thead><tr><th>繰り返し</th><th>表示に使う <code>score</code></th><th>確認したいこと</th></tr></thead><tbody><tr><td>1回目</td><td><code>12345678</code></td><td>時間・分・秒・ミリ秒がすべて出るか</td></tr><tr><td>2回目</td><td><code>1234567</code></td><td>時間が0のとき、時間を出さないか</td></tr><tr><td>3回目</td><td><code>123456</code></td><td>分・秒・ミリ秒だけで表示できるか</td></tr><tr><td>4回目</td><td><code>12345</code></td><td>分が0のとき、分を出さないか</td></tr></tbody></table></div>
 <h3>仕上げの考え方</h3>
 <p>この演習で一番大事なのは、次の順番です。</p>
-<div class="code-shell" data-lang="text"><div class="code-toolbar"><span>text</span><button type="button">コピー</button></div><pre><code>1. ミリ秒から、ミリ秒部分を取り出す
-2. 全体を秒に直す
-3. 秒部分を取り出す
-4. 全体を分に直す
-5. 分部分を取り出す
-6. 残った値を時間として扱う
-7. 0ではない単位だけを文字列に追加する</code></pre></div>
+<div class="table-wrap"><table><thead><tr><th>順番</th><th>やること</th><th>何が分かるか</th></tr></thead><tbody><tr><td>1</td><td>ミリ秒から、ミリ秒部分を取り出す</td><td><code>msec</code> の値</td></tr><tr><td>2</td><td>残りを「何秒ぶんあるか」にする</td><td><code>secScore</code> の値</td></tr><tr><td>3</td><td>秒部分を取り出す</td><td><code>sec</code> の値</td></tr><tr><td>4</td><td>残りを「何分ぶんあるか」にする</td><td><code>minScore</code> の値</td></tr><tr><td>5</td><td>分部分を取り出す</td><td><code>min</code> の値</td></tr><tr><td>6</td><td>残った値を時間として扱う</td><td><code>hour</code> の値</td></tr><tr><td>7</td><td>0ではない単位だけを文字列に追加する</td><td>表示用の文字列</td></tr></tbody></table></div>
 <p>一気に完成させようとすると難しく見えますが、やっていることは「単位を1つずつ分ける」「必要なものだけ表示する」の2つです。</p>
 <p>まずは変数 <code>msec</code>, <code>sec</code>, <code>min</code>, <code>hour</code> に期待した値が入るかを確認し、その後で文字列を組み立ててください。</p>
 </section>
