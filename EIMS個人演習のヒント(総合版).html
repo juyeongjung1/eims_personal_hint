@@ -131,6 +131,31 @@ pre {
   border-radius: 4px; padding: 0 4px; font-weight: 800;
   box-shadow: 0 0 0 2px rgba(255, 224, 138, 0.35);
 }
+.division-card {
+  display: grid; grid-template-columns: minmax(220px, 280px) minmax(0, 1fr); gap: 18px;
+  align-items: center; background: #fff8d9; border: 1px solid #e3bd66;
+  border-radius: 8px; padding: 18px; margin: 16px 0;
+}
+.division-figure {
+  font-family: Consolas, "Courier New", monospace; font-size: 30px; font-weight: 800;
+  color: #283133; background: #fffdf0; border-radius: 8px; padding: 16px 18px;
+  min-height: 190px;
+}
+.division-quotient { margin-left: 118px; color: var(--red); letter-spacing: 0.08em; }
+.division-row { display: flex; align-items: flex-start; }
+.division-divisor { width: 86px; text-align: right; padding: 9px 10px 0 0; }
+.division-bracket {
+  min-width: 132px; border-top: 4px solid #485052; border-left: 4px solid #485052;
+  border-radius: 0 0 0 10px; padding: 7px 0 0 12px; line-height: 1.1;
+}
+.division-product { margin: 8px 0 0 104px; color: #6d7477; }
+.division-line { width: 132px; height: 4px; background: #485052; margin: 2px 0 0 104px; }
+.division-remainder { margin-left: 142px; color: var(--green); }
+.division-explain p { margin: 8px 0; }
+.division-formula {
+  display: inline-block; font-weight: 800; color: #243235; background: white;
+  border: 1px solid #e3bd66; border-radius: 999px; padding: 4px 11px;
+}
 .table-wrap { overflow: auto; margin: 16px 0; border: 1px solid var(--line); border-radius: 8px; }
 table { width: 100%; border-collapse: collapse; background: white; font-size: 14px; }
 th, td { border-bottom: 1px solid var(--line); padding: 10px 12px; vertical-align: top; }
@@ -145,6 +170,7 @@ figcaption { font-size: 13px; color: var(--muted); padding: 8px 12px; border-top
   .topbar { position: static; margin-top: 0; }
   .topbar-row { grid-template-columns: 1fr; }
   .search-status { text-align: left; }
+  .division-card { grid-template-columns: 1fr; }
   .exercise { padding: 20px 16px; }
   h1 { font-size: 27px; }
 }
@@ -205,6 +231,7 @@ figcaption { font-size: 13px; color: var(--muted); padding: 8px 12px; border-top
 <p>たとえば、<code>12345</code> ミリ秒を考えます。</p>
 <p><code>12345 % 1000</code> は <code>345</code> です。これは「1000ミリ秒で割り切れずに残った部分」なので、ミリ秒部分になります。</p>
 <p><code>12345 / 1000</code> は <code>12</code> です。これは「全体を秒に直した値」になります。</p>
+<div class="division-card"><div class="division-figure" role="img" aria-label="12345 割る 1000 は 12 あまり 345"><div class="division-quotient">12</div><div class="division-row"><span class="division-divisor">1000</span><span class="division-bracket"><span>12345</span></span></div><div class="division-product">12000</div><div class="division-line"></div><div class="division-remainder">345</div></div><div class="division-explain"><p class="division-formula">12345 ÷ 1000 = 12 あまり 345</p><p><code>12345 % 1000</code> は、この筆算の「あまり」である <code>345</code> を取り出す計算です。</p><p>つまり、商の <code>12</code> は「全体を秒に直した値」、余りの <code>345</code> は「ミリ秒部分」です。</p></div></div>
 <p>このように、<code>%</code> は今見ている単位の残りを取り出すために使い、<code>/</code> は次の大きな単位へ進むために使います。</p>
 <h3>3. 各変数の役割を確認する</h3>
 <p>計算は、ミリ秒 → 秒 → 分 → 時間の順番で進めると考えやすいです。</p>

@@ -41,7 +41,48 @@ def inline(text: str) -> str:
     return escaped
 
 
+def long_division_html(code: str) -> str:
+    values = {}
+    for line in code.splitlines():
+        if "=" not in line:
+            continue
+        key, value = line.split("=", 1)
+        values[key.strip()] = value.strip()
+
+    dividend = html.escape(values.get("dividend", "12345"))
+    divisor = html.escape(values.get("divisor", "1000"))
+    quotient = html.escape(values.get("quotient", "12"))
+    product = html.escape(values.get("product", "12000"))
+    remainder = html.escape(values.get("remainder", "345"))
+    formula = inline(values.get("formula", "12345 % 1000 は 345"))
+    note = inline(values.get("note", "% は、割り算をしたときの余りだけを取り出します。"))
+
+    return (
+        '<div class="division-card">'
+        '<div class="division-figure" role="img" '
+        f'aria-label="{dividend} 割る {divisor} は {quotient} あまり {remainder}">'
+        f'<div class="division-quotient">{quotient}</div>'
+        '<div class="division-row">'
+        f'<span class="division-divisor">{divisor}</span>'
+        f'<span class="division-bracket"><span>{dividend}</span></span>'
+        '</div>'
+        f'<div class="division-product">{product}</div>'
+        '<div class="division-line"></div>'
+        f'<div class="division-remainder">{remainder}</div>'
+        '</div>'
+        '<div class="division-explain">'
+        f'<p class="division-formula">{formula}</p>'
+        f'<p>{note}</p>'
+        '<p>つまり、商の <code>12</code> は「全体を秒に直した値」、余りの <code>345</code> は「ミリ秒部分」です。</p>'
+        '</div>'
+        '</div>'
+    )
+
+
 def code_html(code: str, lang: str) -> str:
+    if lang == "longdivision":
+        return long_division_html(code)
+
     escaped_lines = []
     for line in html.escape(code.rstrip("\n")).splitlines():
         line = line.replace("____", '<span class="blank">____</span>')
@@ -360,6 +401,31 @@ pre {{
   border-radius: 4px; padding: 0 4px; font-weight: 800;
   box-shadow: 0 0 0 2px rgba(255, 224, 138, 0.35);
 }}
+.division-card {{
+  display: grid; grid-template-columns: minmax(220px, 280px) minmax(0, 1fr); gap: 18px;
+  align-items: center; background: #fff8d9; border: 1px solid #e3bd66;
+  border-radius: 8px; padding: 18px; margin: 16px 0;
+}}
+.division-figure {{
+  font-family: Consolas, "Courier New", monospace; font-size: 30px; font-weight: 800;
+  color: #283133; background: #fffdf0; border-radius: 8px; padding: 16px 18px;
+  min-height: 190px;
+}}
+.division-quotient {{ margin-left: 118px; color: var(--red); letter-spacing: 0.08em; }}
+.division-row {{ display: flex; align-items: flex-start; }}
+.division-divisor {{ width: 86px; text-align: right; padding: 9px 10px 0 0; }}
+.division-bracket {{
+  min-width: 132px; border-top: 4px solid #485052; border-left: 4px solid #485052;
+  border-radius: 0 0 0 10px; padding: 7px 0 0 12px; line-height: 1.1;
+}}
+.division-product {{ margin: 8px 0 0 104px; color: #6d7477; }}
+.division-line {{ width: 132px; height: 4px; background: #485052; margin: 2px 0 0 104px; }}
+.division-remainder {{ margin-left: 142px; color: var(--green); }}
+.division-explain p {{ margin: 8px 0; }}
+.division-formula {{
+  display: inline-block; font-weight: 800; color: #243235; background: white;
+  border: 1px solid #e3bd66; border-radius: 999px; padding: 4px 11px;
+}}
 .table-wrap {{ overflow: auto; margin: 16px 0; border: 1px solid var(--line); border-radius: 8px; }}
 table {{ width: 100%; border-collapse: collapse; background: white; font-size: 14px; }}
 th, td {{ border-bottom: 1px solid var(--line); padding: 10px 12px; vertical-align: top; }}
@@ -374,6 +440,7 @@ figcaption {{ font-size: 13px; color: var(--muted); padding: 8px 12px; border-to
   .topbar {{ position: static; margin-top: 0; }}
   .topbar-row {{ grid-template-columns: 1fr; }}
   .search-status {{ text-align: left; }}
+  .division-card {{ grid-template-columns: 1fr; }}
   .exercise {{ padding: 20px 16px; }}
   h1 {{ font-size: 27px; }}
 }}
