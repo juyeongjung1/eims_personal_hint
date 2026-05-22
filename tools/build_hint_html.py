@@ -15,6 +15,11 @@ def slugify(text: str, index: int) -> str:
     return token or f"section-{index}"
 
 
+def exercise_group(title: str) -> str:
+    match = re.search(r"演習(\d+)", title)
+    return f"ex{match.group(1)}" if match else "other"
+
+
 def inline(text: str) -> str:
     escaped = html.escape(text)
 
@@ -61,10 +66,10 @@ def render_table(lines: list[str]) -> str:
     return "".join(out)
 
 
-def render_blocks(markdown: str) -> tuple[str, list[tuple[str, str]]]:
+def render_blocks(markdown: str) -> tuple[str, list[tuple[str, str, str]]]:
     lines = markdown.splitlines()
     parts: list[str] = []
-    toc: list[tuple[str, str]] = []
+    toc: list[tuple[str, str, str]] = []
     section_open = False
     paragraph: list[str] = []
     list_lines: list[str] = []
@@ -80,6 +85,10 @@ def render_blocks(markdown: str) -> tuple[str, list[tuple[str, str]]]:
         paragraph = []
         if text.startswith("※"):
             parts.append(f'<aside class="reference">{inline(text)}</aside>')
+        elif text.startswith("ポイントは") or text.startswith("ポイント:") or text.startswith("ポイント："):
+            parts.append(f'<aside class="point-box"><strong>ポイント</strong><p>{inline(text)}</p></aside>')
+        elif text.startswith("注意") or "注意してください" in text:
+            parts.append(f'<aside class="caution-box"><strong>注意</strong><p>{inline(text)}</p></aside>')
         elif text.endswith(":") or text.endswith("："):
             parts.append(f'<p class="lead-label">{inline(text)}</p>')
         else:
@@ -147,8 +156,9 @@ def render_blocks(markdown: str) -> tuple[str, list[tuple[str, str]]]:
             section_index += 1
             title = line[3:].strip()
             sid = slugify(title, section_index)
-            toc.append((sid, title))
-            parts.append(f'<section class="exercise" id="{sid}" data-title="{html.escape(title)}"><h2>{inline(title)}</h2>')
+            group = exercise_group(title)
+            toc.append((sid, title, group))
+            parts.append(f'<section class="exercise" id="{sid}" data-title="{html.escape(title)}" data-group="{group}"><h2>{inline(title)}</h2>')
             section_open = True
             i += 1
             continue
@@ -157,7 +167,12 @@ def render_blocks(markdown: str) -> tuple[str, list[tuple[str, str]]]:
             flush_paragraph()
             flush_list()
             title = line[4:].strip()
-            parts.append(f"<h3>{inline(title)}</h3>")
+            hclass = ""
+            if "注意" in title:
+                hclass = ' class="caution-heading"'
+            elif "ポイント" in title or "仕様" in title:
+                hclass = ' class="point-heading"'
+            parts.append(f"<h3{hclass}>{inline(title)}</h3>")
             i += 1
             continue
 
@@ -198,8 +213,8 @@ def render_blocks(markdown: str) -> tuple[str, list[tuple[str, str]]]:
     return "\n".join(parts), toc
 
 
-def build_html(body: str, toc: list[tuple[str, str]]) -> str:
-    toc_items = "\n".join(f'<a href="#{sid}">{inline(title)}</a>' for sid, title in toc)
+def build_html(body: str, toc: list[tuple[str, str, str]]) -> str:
+    toc_items = "\n".join(f'<a href="#{sid}" data-group="{group}">{inline(title)}</a>' for sid, title, group in toc)
     return f"""<!doctype html>
 <html lang="ja">
 <head>
@@ -243,6 +258,17 @@ body {{
   width: 100%; height: 40px; border: 1px solid var(--line); border-radius: 6px;
   padding: 0 10px; background: white; font-size: 14px;
 }}
+.tabs {{
+  position: sticky; top: 0; z-index: 3; display: flex; flex-wrap: wrap; gap: 8px;
+  background: rgba(247, 248, 245, 0.94); backdrop-filter: blur(8px);
+  padding: 10px 0 14px; margin: -12px 0 18px; border-bottom: 1px solid var(--line);
+}}
+.tabs button {{
+  border: 1px solid var(--line-strong); background: white; color: #203431;
+  border-radius: 999px; padding: 8px 13px; cursor: pointer; font-weight: 700; font-size: 14px;
+}}
+.tabs button:hover {{ border-color: var(--green); color: var(--green); background: var(--green-soft); }}
+.tabs button.active {{ background: var(--green); border-color: var(--green); color: white; }}
 nav {{ display: grid; gap: 4px; margin-top: 18px; }}
 nav a {{
   color: var(--ink); text-decoration: none; padding: 8px 10px; border-radius: 6px;
@@ -270,10 +296,21 @@ p {{ margin: 10px 0; }}
   padding: 13px 15px; margin: 16px 0; border-radius: 0 6px 6px 0; font-weight: 700;
   box-shadow: inset 0 0 0 1px rgba(31, 122, 98, 0.08);
 }}
+.point-box, .caution-box {{
+  margin: 16px 0; padding: 14px 15px; border-radius: 8px; border: 1px solid;
+}}
+.point-box {{ background: #edf7f3; border-color: #b9d8cb; }}
+.caution-box {{ background: #fff4df; border-color: #e3bd66; }}
+.point-box strong {{ color: var(--green); }}
+.caution-box strong {{ color: var(--amber); }}
+.point-box p, .caution-box p {{ margin: 6px 0 0; }}
 .lead-label {{
   font-weight: 700; color: var(--green); margin-top: 20px; padding: 8px 10px;
   background: #f1f7f4; border-left: 4px solid var(--green); border-radius: 0 5px 5px 0;
 }}
+.point-heading, .caution-heading {{ padding-left: 10px; border-left: 5px solid; }}
+.point-heading {{ border-color: var(--green); }}
+.caution-heading {{ border-color: #e3b341; color: #6f4e00; }}
 ul, ol {{ padding-left: 1.4rem; }}
 li {{ margin: 5px 0; }}
 code {{ background: #eef2f1; padding: 0.1em 0.35em; border-radius: 4px; font-family: Consolas, "Courier New", monospace; }}
@@ -314,11 +351,12 @@ figure {{ margin: 18px 0; border: 1px solid var(--line); border-radius: 8px; ove
 figure img {{ display: block; width: 100%; height: auto; }}
 figcaption {{ font-size: 13px; color: var(--muted); padding: 8px 12px; border-top: 1px solid var(--line); }}
 .no-results {{ display: none; padding: 18px; background: var(--amber-soft); color: var(--amber); border-radius: 8px; }}
-.exercise.hidden {{ display: none; }}
+.exercise.hidden, nav a.hidden {{ display: none; }}
 @media (max-width: 860px) {{
   .layout {{ grid-template-columns: 1fr; }}
   .sidebar {{ position: static; height: auto; border-right: 0; border-bottom: 1px solid var(--line); }}
   main {{ padding: 24px 16px 60px; }}
+  .tabs {{ position: static; margin-top: 0; }}
   .exercise {{ padding: 20px 16px; }}
   h1 {{ font-size: 27px; }}
 }}
@@ -333,6 +371,14 @@ figcaption {{ font-size: 13px; color: var(--muted); padding: 8px 12px; border-to
   <nav id="toc">{toc_items}</nav>
 </aside>
 <main>
+<div class="tabs" role="tablist" aria-label="演習グループ">
+  <button type="button" class="active" data-tab="all">すべて</button>
+  <button type="button" data-tab="ex1">演習1</button>
+  <button type="button" data-tab="ex2">演習2</button>
+  <button type="button" data-tab="ex3">演習3</button>
+  <button type="button" data-tab="ex4">演習4</button>
+  <button type="button" data-tab="ex5">演習5</button>
+</div>
 {body}
 <p class="no-results" id="noResults">該当する演習がありません。検索語を変えてください。</p>
 </main>
@@ -341,15 +387,38 @@ figcaption {{ font-size: 13px; color: var(--muted); padding: 8px 12px; border-to
 const search = document.getElementById('search');
 const sections = Array.from(document.querySelectorAll('.exercise'));
 const noResults = document.getElementById('noResults');
-search.addEventListener('input', () => {{
+const tabButtons = Array.from(document.querySelectorAll('[data-tab]'));
+const tocLinks = Array.from(document.querySelectorAll('nav a'));
+let activeGroup = 'all';
+
+function applyFilters() {{
   const q = search.value.trim().toLowerCase();
   let shown = 0;
   sections.forEach(section => {{
-    const hit = !q || section.textContent.toLowerCase().includes(q);
+    const groupHit = activeGroup === 'all' || section.dataset.group === activeGroup;
+    const searchHit = !q || section.textContent.toLowerCase().includes(q);
+    const hit = groupHit && searchHit;
     section.classList.toggle('hidden', !hit);
     if (hit) shown++;
   }});
+  tocLinks.forEach(link => {{
+    const groupHit = activeGroup === 'all' || link.dataset.group === activeGroup;
+    const target = document.querySelector(link.getAttribute('href'));
+    const searchHit = !q || (target && target.textContent.toLowerCase().includes(q));
+    link.classList.toggle('hidden', !(groupHit && searchHit));
+  }});
   noResults.style.display = shown ? 'none' : 'block';
+}}
+
+search.addEventListener('input', applyFilters);
+tabButtons.forEach(button => {{
+  button.addEventListener('click', () => {{
+    activeGroup = button.dataset.tab;
+    tabButtons.forEach(tab => tab.classList.toggle('active', tab === button));
+    applyFilters();
+    const firstVisible = sections.find(section => !section.classList.contains('hidden'));
+    if (firstVisible) firstVisible.scrollIntoView({{ behavior: 'smooth', block: 'start' }});
+  }});
 }});
 document.querySelectorAll('.code-toolbar button').forEach(button => {{
   button.addEventListener('click', async () => {{
@@ -365,7 +434,6 @@ window.addEventListener('scroll', () => {{
   const max = document.documentElement.scrollHeight - window.innerHeight;
   progress.style.width = max > 0 ? `${{(window.scrollY / max) * 100}}%` : '0';
 }});
-const tocLinks = Array.from(document.querySelectorAll('nav a'));
 const observer = new IntersectionObserver(entries => {{
   entries.forEach(entry => {{
     if (entry.isIntersecting) {{
@@ -374,6 +442,7 @@ const observer = new IntersectionObserver(entries => {{
   }});
 }}, {{ rootMargin: '-30% 0px -60% 0px', threshold: 0 }});
 sections.forEach(section => observer.observe(section));
+applyFilters();
 </script>
 </body>
 </html>
