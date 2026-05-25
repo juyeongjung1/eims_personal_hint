@@ -10,14 +10,24 @@ ROOT = Path(__file__).resolve().parents[1]
 SOURCE = ROOT / "EIMS個人演習のヒント(総合版).md"
 OUTPUT = ROOT / "EIMS個人演習のヒント(総合版).html"
 
-# 配布前にここへ時刻を入れると、その時刻以降に各演習のヒントが表示されます。
-# 空欄の演習は常に表示されます。例: "ex1": "10:00"
+# 配布前にここへ日時を入れると、その日時以降に各演習のヒントが表示されます。
+# ローカルHTML配布用の簡易制御です。厳密なアクセス制御ではありません。
 RELEASE_SCHEDULE = {
-    "ex1": "",
-    "ex2": "",
-    "ex3": "",
-    "ex4": "",
-    "ex5": "",
+    "ex1-1": {"label": "6/9 10:20", "datetime": "2026-06-09T10:20:00+09:00"},
+    "ex1-2": {"label": "6/9 11:00", "datetime": "2026-06-09T11:00:00+09:00"},
+    "ex2-1": {"label": "6/9 11:30", "datetime": "2026-06-09T11:30:00+09:00"},
+    "ex2-2": {"label": "6/9 12:00", "datetime": "2026-06-09T12:00:00+09:00"},
+    "ex2-3": {"label": "6/9 13:40", "datetime": "2026-06-09T13:40:00+09:00"},
+    "ex3-1": {"label": "6/9 14:20", "datetime": "2026-06-09T14:20:00+09:00"},
+    "ex3-2": {"label": "6/9 14:40", "datetime": "2026-06-09T14:40:00+09:00"},
+    "ex3-3": {"label": "6/9 15:40", "datetime": "2026-06-09T15:40:00+09:00"},
+    "ex4-1": {"label": "6/10 10:40", "datetime": "2026-06-10T10:40:00+09:00"},
+    "ex4-2": {"label": "6/10 10:40", "datetime": "2026-06-10T10:40:00+09:00"},
+    "ex4-3": {"label": "6/10 10:40", "datetime": "2026-06-10T10:40:00+09:00"},
+    "ex5-1": {"label": "6/10 11:30", "datetime": "2026-06-10T11:30:00+09:00"},
+    "ex5-2": {"label": "6/10 11:50", "datetime": "2026-06-10T11:50:00+09:00"},
+    "ex5-3": {"label": "6/10 14:10", "datetime": "2026-06-10T14:10:00+09:00"},
+    "ex5-4": {"label": "6/10 15:30", "datetime": "2026-06-10T15:30:00+09:00"},
 }
 
 JAVA_KEYWORDS = {
@@ -57,6 +67,11 @@ def slugify(text: str, index: int) -> str:
 def exercise_group(title: str) -> str:
     match = re.search(r"演習(\d+)", title)
     return f"ex{match.group(1)}" if match else "other"
+
+
+def exercise_key(title: str) -> str:
+    match = re.search(r"演習(\d+)\.(\d+)", title)
+    return f"ex{match.group(1)}-{match.group(2)}" if match else exercise_group(title)
 
 
 def inline(text: str) -> str:
@@ -286,8 +301,9 @@ def render_blocks(markdown: str) -> tuple[str, list[tuple[str, str, str]]]:
             title = line[3:].strip()
             sid = slugify(title, section_index)
             group = exercise_group(title)
+            key = exercise_key(title)
             toc.append((sid, title, group))
-            parts.append(f'<section class="exercise" id="{sid}" data-title="{html.escape(title)}" data-group="{group}"><h2>{inline(title)}</h2>')
+            parts.append(f'<section class="exercise" id="{sid}" data-title="{html.escape(title)}" data-group="{group}" data-exercise="{key}"><h2>{inline(title)}</h2>')
             section_open = True
             i += 1
             continue
@@ -389,6 +405,11 @@ body {{
   display: grid; grid-template-columns: 180px minmax(220px, 1fr) auto; gap: 12px;
   align-items: center; margin-bottom: 10px;
 }}
+.schedule-banner {{
+  margin: 14px 0 0; padding: 10px 12px; border: 1px solid #b7dce8;
+  border-radius: 8px; background: #eef9fc; color: #21424c; font-size: 13px;
+}}
+.schedule-banner strong {{ color: #0f5f76; }}
 .search {{
   width: 100%; height: 40px; border: 1px solid var(--line); border-radius: 6px;
   padding: 0 10px; background: white; font-size: 14px;
@@ -411,6 +432,16 @@ main {{ max-width: 1040px; width: 100%; margin: 0 auto; padding: 40px 42px 80px;
   background: var(--amber-soft); border: 1px solid #e3bd66; border-radius: 999px;
   padding: 3px 9px; font-size: 12px; font-weight: 700; margin-left: 8px;
 }}
+.release-note.open {{
+  color: var(--green); background: var(--green-soft); border-color: #b9d8cb;
+}}
+.locked-message {{
+  margin: 14px 0 0; padding: 16px; border: 1px solid #e3bd66; border-radius: 8px;
+  background: #fff8e7; color: #654700; font-weight: 700;
+}}
+.locked-message small {{
+  display: block; margin-top: 4px; color: #7b6125; font-weight: 500;
+}}
 .doc-hero {{
   padding: 20px 0 30px; border-bottom: 2px solid var(--line); margin-bottom: 26px;
 }}
@@ -426,6 +457,8 @@ p {{ margin: 10px 0; }}
   background: var(--paper); border: 1px solid var(--line); border-radius: 8px;
   padding: 28px; margin: 22px 0; box-shadow: 0 1px 2px rgba(20, 30, 28, 0.04);
 }}
+.exercise.locked > :not(h2):not(.locked-message) {{ display: none; }}
+.exercise.locked {{ border-color: #e3bd66; background: #fffdf7; }}
 .reference {{
   border-left: 6px solid var(--green); background: var(--green-soft);
   padding: 13px 15px; margin: 16px 0; border-radius: 0 6px 6px 0; font-weight: 700;
@@ -551,6 +584,10 @@ figcaption {{ font-size: 13px; color: var(--muted); padding: 8px 12px; border-to
     <button type="button" data-tab="ex4">演習4</button>
     <button type="button" data-tab="ex5">演習5</button>
   </div>
+  <div class="schedule-banner">
+    <strong>公開スケジュール:</strong>
+    2026/6/9は演習1〜3、2026/6/10は演習4〜5を、演習ごとの予定時刻に合わせて表示します。
+  </div>
 </div>
 {body}
 <p class="no-results" id="noResults">該当する演習がありません。検索語または公開時刻を確認してください。</p>
@@ -565,39 +602,60 @@ const tabButtons = Array.from(document.querySelectorAll('[data-tab]'));
 const releaseSchedule = {release_schedule_json};
 let activeGroup = 'all';
 
-function minutesOfDay(timeText) {{
-  const [hour, minute] = timeText.split(':').map(Number);
-  return hour * 60 + minute;
+function scheduleFor(section) {{
+  return releaseSchedule[section.dataset.exercise] || null;
 }}
 
-function isReleased(group) {{
-  const releaseTime = releaseSchedule[group];
-  if (!releaseTime) return true;
-  const now = new Date();
-  const currentMinutes = now.getHours() * 60 + now.getMinutes();
-  return currentMinutes >= minutesOfDay(releaseTime);
+function isReleased(section) {{
+  const schedule = scheduleFor(section);
+  if (!schedule || !schedule.datetime) return true;
+  return Date.now() >= new Date(schedule.datetime).getTime();
 }}
 
-function releaseLabel(group) {{
-  return releaseSchedule[group] ? `${{releaseSchedule[group]}}公開` : '';
+function releaseLabel(section) {{
+  const schedule = scheduleFor(section);
+  return schedule ? `${{schedule.label}}公開` : '';
+}}
+
+function ensureLockedMessage(section) {{
+  let message = section.querySelector('.locked-message');
+  if (!message) {{
+    message = document.createElement('div');
+    message.className = 'locked-message';
+    section.appendChild(message);
+  }}
+  message.innerHTML = `このヒントは <strong>${{releaseLabel(section)}}</strong> です。<small>公開時刻になると、この画面を開いたままでも自動的に表示されます。</small>`;
+}}
+
+function removeLockedMessage(section) {{
+  const message = section.querySelector('.locked-message');
+  if (message) message.remove();
 }}
 
 function applyFilters() {{
   const q = search.value.trim().toLowerCase();
   let shown = 0;
   sections.forEach(section => {{
+    const released = isReleased(section);
+    const schedule = scheduleFor(section);
     const groupHit = activeGroup === 'all' || section.dataset.group === activeGroup;
-    const searchHit = !q || section.textContent.toLowerCase().includes(q);
-    const releaseHit = isReleased(section.dataset.group);
-    const hit = groupHit && searchHit && releaseHit;
+    const searchText = released ? section.textContent : section.dataset.title;
+    const searchHit = !q || searchText.toLowerCase().includes(q);
+    const hit = groupHit && searchHit;
     section.classList.toggle('hidden', !hit);
+    section.classList.toggle('locked', !released);
+    if (released) {{
+      removeLockedMessage(section);
+    }} else {{
+      ensureLockedMessage(section);
+    }}
     const heading = section.querySelector('h2');
     const existingNote = heading && heading.querySelector('.release-note');
     if (existingNote) existingNote.remove();
-    if (heading && releaseSchedule[section.dataset.group]) {{
+    if (heading && schedule) {{
       const note = document.createElement('span');
-      note.className = 'release-note';
-      note.textContent = releaseLabel(section.dataset.group);
+      note.className = released ? 'release-note open' : 'release-note';
+      note.textContent = released ? '公開中' : releaseLabel(section);
       heading.appendChild(note);
     }}
     if (hit) shown++;
