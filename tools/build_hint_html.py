@@ -111,6 +111,11 @@ def span(class_name: str, text: str) -> str:
     return f'<span class="{class_name}">{html.escape(text)}</span>'
 
 
+def string_span(text: str) -> str:
+    escaped = html.escape(text).replace("____", '<span class="blank">____</span>')
+    return f'<span class="tok-string">{escaped}</span>'
+
+
 def next_code_token(tokens: list[str], index: int) -> str:
     for token in tokens[index + 1 :]:
         if not token.isspace():
@@ -128,7 +133,7 @@ def highlight_java_line(line: str) -> str:
         elif token.startswith("//"):
             highlighted.append(span("tok-comment", token))
         elif token.startswith('"'):
-            highlighted.append(span("tok-string", token))
+            highlighted.append(string_span(token))
         elif token.isdigit():
             highlighted.append(span("tok-number", token))
         elif re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", token):
