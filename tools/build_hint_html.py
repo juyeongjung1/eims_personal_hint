@@ -425,8 +425,10 @@ body {{
   border-color: var(--green); color: var(--green); background: var(--green-soft);
 }}
 .instructor-panel {{
-  display: none; margin: 12px 0 0; padding: 14px; border: 1px solid var(--line-strong);
-  border-radius: 8px; background: white;
+  display: none; position: fixed; top: 70px; right: 22px; z-index: 10;
+  width: min(720px, calc(100vw - 32px)); max-height: calc(100vh - 92px);
+  overflow: auto; padding: 16px; border: 1px solid var(--line-strong);
+  border-radius: 8px; background: white; box-shadow: 0 16px 44px rgba(20, 30, 28, 0.2);
 }}
 .instructor-panel.open {{ display: block; }}
 .instructor-panel h3 {{ margin: 0 0 10px; font-size: 16px; color: #243235; }}
@@ -594,6 +596,7 @@ figcaption {{ font-size: 13px; color: var(--muted); padding: 8px 12px; border-to
   .topbar {{ position: static; margin-top: 0; }}
   .topbar-row {{ grid-template-columns: 1fr; }}
   .search-status {{ text-align: left; }}
+  .instructor-panel {{ top: 14px; right: 14px; left: 14px; width: auto; max-height: calc(100vh - 28px); }}
   .instructor-login, .schedule-editor, .schedule-row {{ grid-template-columns: 1fr; }}
   .division-card {{ grid-template-columns: 1fr; }}
   .exercise {{ padding: 20px 16px; }}
