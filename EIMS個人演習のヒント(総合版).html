@@ -1168,6 +1168,19 @@ instructorButton.addEventListener('click', () => {
   }
 });
 
+document.addEventListener('click', event => {
+  if (!instructorPanel.classList.contains('open')) return;
+  const clickedPanel = instructorPanel.contains(event.target);
+  const clickedButton = instructorButton.contains(event.target);
+  if (!clickedPanel && !clickedButton) {
+    instructorPanel.classList.remove('open');
+  }
+});
+
+document.addEventListener('keydown', event => {
+  if (event.key === 'Escape') instructorPanel.classList.remove('open');
+});
+
 instructorLogin.addEventListener('click', async () => {
   const input = instructorPassword.value;
   let hash = '';
