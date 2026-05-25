@@ -591,6 +591,10 @@ figure img {{ display: block; width: 100%; height: auto; }}
 figcaption {{ font-size: 13px; color: var(--muted); padding: 8px 12px; border-top: 1px solid var(--line); }}
 .no-results {{ display: none; padding: 18px; background: var(--amber-soft); color: var(--amber); border-radius: 8px; }}
 .exercise.hidden {{ display: none; }}
+.search-highlight {{
+  background: #ffdf5a; color: #241600; border-radius: 4px; padding: 0 2px;
+  box-shadow: 0 0 0 2px rgba(255, 223, 90, 0.35); font-weight: 800;
+}}
 @media (max-width: 860px) {{
   main {{ padding: 24px 16px 60px; }}
   .topbar {{ position: static; margin-top: 0; }}
@@ -776,9 +780,59 @@ function removeLockedMessage(section) {{
   if (message) message.remove();
 }}
 
+function escapeRegExp(text) {{
+  return text.replace(/[.*+?^${{}}()|[\\]\\\\]/g, '\\\\$&');
+}}
+
+function removeSearchHighlights(root) {{
+  root.querySelectorAll('mark.search-highlight').forEach(mark => {{
+    mark.replaceWith(document.createTextNode(mark.textContent));
+  }});
+  root.normalize();
+}}
+
+function highlightSearchMatches(root, query) {{
+  if (!query) return;
+  const pattern = new RegExp(escapeRegExp(query), 'gi');
+  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {{
+    acceptNode(node) {{
+      const parent = node.parentElement;
+      if (!parent) return NodeFilter.FILTER_REJECT;
+      if (parent.closest('script, style, input, textarea, button, .release-note, .locked-message')) {{
+        return NodeFilter.FILTER_REJECT;
+      }}
+      pattern.lastIndex = 0;
+      return pattern.test(node.nodeValue) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;
+    }}
+  }});
+  const nodes = [];
+  while (walker.nextNode()) nodes.push(walker.currentNode);
+  nodes.forEach(node => {{
+    pattern.lastIndex = 0;
+    const fragment = document.createDocumentFragment();
+    let lastIndex = 0;
+    node.nodeValue.replace(pattern, (match, offset) => {{
+      if (offset > lastIndex) {{
+        fragment.appendChild(document.createTextNode(node.nodeValue.slice(lastIndex, offset)));
+      }}
+      const mark = document.createElement('mark');
+      mark.className = 'search-highlight';
+      mark.textContent = match;
+      fragment.appendChild(mark);
+      lastIndex = offset + match.length;
+      return match;
+    }});
+    if (lastIndex < node.nodeValue.length) {{
+      fragment.appendChild(document.createTextNode(node.nodeValue.slice(lastIndex)));
+    }}
+    node.replaceWith(fragment);
+  }});
+}}
+
 function applyFilters() {{
   const q = search.value.trim().toLowerCase();
   let shown = 0;
+  sections.forEach(section => removeSearchHighlights(section));
   sections.forEach(section => {{
     const released = isReleased(section);
     const schedule = scheduleFor(section);
@@ -802,6 +856,7 @@ function applyFilters() {{
       note.textContent = isInstructor && forceOpen ? '講師表示中' : released ? '公開中' : releaseLabel(section);
       heading.appendChild(note);
     }}
+    if (hit && q) highlightSearchMatches(section, q);
     if (hit) shown++;
   }});
   noResults.style.display = shown ? 'none' : 'block';
