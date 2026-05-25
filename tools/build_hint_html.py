@@ -674,6 +674,7 @@ let releaseSchedule = mergeReleaseSchedule(readJson(scheduleOverrideKey, {{}}));
 let isInstructor = localStorage.getItem(authKey) === 'true';
 let forceOpen = localStorage.getItem(forceOpenKey) !== 'false';
 let activeGroup = 'all';
+let releaseTimer = null;
 
 function readJson(key, fallback) {{
   try {{
@@ -767,7 +768,7 @@ function ensureLockedMessage(section) {{
     message.className = 'locked-message';
     section.appendChild(message);
   }}
-  message.innerHTML = `このヒントは <strong>${{releaseLabel(section)}}</strong> です。<small>公開時刻になると、この画面を開いたままでも自動的に表示されます。</small>`;
+  message.innerHTML = `このヒントは <strong>${{releaseLabel(section)}}</strong> です。<small>公開時刻になると、この画面を開いたままでも数秒以内に表示されます。</small>`;
 }}
 
 function removeLockedMessage(section) {{
@@ -805,6 +806,25 @@ function applyFilters() {{
   }});
   noResults.style.display = shown ? 'none' : 'block';
   searchStatus.textContent = `${{shown}}件表示中`;
+}}
+
+function scheduleNextReleaseCheck() {{
+  if (releaseTimer) clearTimeout(releaseTimer);
+  if (isInstructor && forceOpen) return;
+  const now = Date.now();
+  const nextTimes = sections
+    .map(section => scheduleFor(section))
+    .filter(schedule => schedule && schedule.datetime)
+    .map(schedule => new Date(schedule.datetime).getTime())
+    .filter(time => Number.isFinite(time) && time > now);
+  if (!nextTimes.length) return;
+  const nextDelay = Math.min(...nextTimes) - now;
+  releaseTimer = setTimeout(refreshReleaseState, Math.min(nextDelay + 250, 2147483647));
+}}
+
+function refreshReleaseState() {{
+  applyFilters();
+  scheduleNextReleaseCheck();
 }}
 
 instructorButton.addEventListener('click', () => {{
@@ -848,7 +868,7 @@ instructorLogin.addEventListener('click', async () => {{
   instructorPassword.value = '';
   setInstructorStatus('講師としてログインしました。全ヒントを表示しています。');
   refreshInstructorUi();
-  applyFilters();
+  refreshReleaseState();
 }});
 
 instructorPassword.addEventListener('keydown', event => {{
@@ -860,14 +880,14 @@ instructorLogout.addEventListener('click', () => {{
   localStorage.removeItem(authKey);
   setInstructorStatus('ログアウトしました。');
   refreshInstructorUi();
-  applyFilters();
+  refreshReleaseState();
 }});
 
 forceOpenHints.addEventListener('change', () => {{
   forceOpen = forceOpenHints.checked;
   localStorage.setItem(forceOpenKey, String(forceOpen));
   setInstructorStatus(forceOpen ? '全ヒントを強制表示しています。' : '強制表示をOFFにしました。設定した公開日時で動作確認できます。');
-  applyFilters();
+  refreshReleaseState();
 }});
 
 saveSchedule.addEventListener('click', () => {{
@@ -882,8 +902,8 @@ saveSchedule.addEventListener('click', () => {{
   writeJson(scheduleOverrideKey, overrides);
   releaseSchedule = mergeReleaseSchedule(overrides);
   buildScheduleEditor();
-  setInstructorStatus('このPC用の公開日時を保存しました。強制表示をOFFにすると動作確認できます。');
-  applyFilters();
+  setInstructorStatus(forceOpen ? 'このPC用の公開日時を保存しました。強制表示をOFFにすると公開状態を確認できます。' : 'このPC用の公開日時を保存し、公開状態を更新しました。');
+  refreshReleaseState();
 }});
 
 resetSchedule.addEventListener('click', () => {{
@@ -891,15 +911,15 @@ resetSchedule.addEventListener('click', () => {{
   releaseSchedule = mergeReleaseSchedule({{}});
   buildScheduleEditor();
   setInstructorStatus('公開日時を初期設定に戻しました。');
-  applyFilters();
+  refreshReleaseState();
 }});
 
-search.addEventListener('input', applyFilters);
+search.addEventListener('input', refreshReleaseState);
 tabButtons.forEach(button => {{
   button.addEventListener('click', () => {{
     activeGroup = button.dataset.tab;
     tabButtons.forEach(tab => tab.classList.toggle('active', tab === button));
-    applyFilters();
+    refreshReleaseState();
     const firstVisible = sections.find(section => !section.classList.contains('hidden'));
     if (firstVisible) firstVisible.scrollIntoView({{ behavior: 'smooth', block: 'start' }});
   }});
@@ -918,8 +938,12 @@ window.addEventListener('scroll', () => {{
   const max = document.documentElement.scrollHeight - window.innerHeight;
   progress.style.width = max > 0 ? `${{(window.scrollY / max) * 100}}%` : '0';
 }});
-applyFilters();
-setInterval(applyFilters, 30000);
+window.addEventListener('focus', refreshReleaseState);
+document.addEventListener('visibilitychange', () => {{
+  if (!document.hidden) refreshReleaseState();
+}});
+refreshReleaseState();
+setInterval(refreshReleaseState, 5000);
 </script>
 </body>
 </html>
