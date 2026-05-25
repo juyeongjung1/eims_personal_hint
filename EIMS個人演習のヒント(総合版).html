@@ -706,6 +706,9 @@ byte&gt; byte
 
 <span class="tok-comment">// 必要な表示が足りない場合は、ここに追加する</span></code></pre></div>
 <p>この問題の実行例では、時間まで出力しなくても良いので、コンストラクタの第3引数には、任意の文字列を入れておけばOKです。</p>
+<p>ここで使っている <code>&quot;now&quot;</code> は、Javaが自動で現在日時に変換してくれる特別な言葉ではありません。 ダブルクォーテーションで囲まれているので、ただの文字列です。</p>
+<div class="table-wrap"><table><thead><tr><th>書き方</th><th>意味</th></tr></thead><tbody><tr><td><code>&quot;now&quot;</code></td><td>Javaの文字列。中身は <code>now</code> という4文字だけ</td></tr><tr><td><code>System.currentTimeMillis()</code></td><td>現在時刻をミリ秒で取得するJavaのメソッド</td></tr><tr><td><code>now()</code></td><td>MySQLで現在日時を入れる関数</td></tr></tbody></table></div>
+<aside class="caution-box"><strong>注意</strong><p>演習3.3では、<code>Score</code> クラスのコンストラクタが「名前・スコア・日付文字列」の3つを必要とするため、第3引数に何か文字列を渡す必要があります。 ただし、この画面では日付を表示しないため、仮の値として <code>&quot;now&quot;</code> を入れているだけです。 <code>&quot;now&quot;</code> と書いたから現在日時が入るわけではない、という点だけ注意してください。</p></aside>
 </section>
 <section class="exercise" id="演習4.1-のヒント" data-title="演習4.1 のヒント" data-group="ex4"><h2>演習4.1 のヒント</h2>
 <h3 class="point-heading">仕様のポイント</h3>
@@ -882,7 +885,10 @@ exit;</code></pre></div>
 <h3 class="point-heading">仕様のポイント</h3>
 <p>今まで実装したパーツを、組み立てれば完成です。</p>
 <ol><li>演習3.3のソースコードでタイピング測定をする</li><li>演習5.3の <code>insert</code> メソッドを呼び出し、DBにタイピング結果を記録する</li><li>演習5.2の <code>select</code> メソッドを呼び出し、<code>return</code> される <code>ArrayList</code> の記録データを、拡張for文で出力します</li></ol>
-<p><code>Score</code> オブジェクト生成時の時間は、任意の文字列（<code>now</code> など）で大丈夫です。登録される時は、演習5.3で作った通りに、MySQL の <code>now()</code> 関数で現在の時間が登録されるからです。</p>
+<p><code>Score</code> オブジェクト生成時の第3引数には、任意の文字列（<code>&quot;now&quot;</code> など）を入れて大丈夫です。 ここでの <code>&quot;now&quot;</code> は、Java側で使う仮の日付文字列です。 本当にDBへ登録される日時は、演習5.3で作った <code>insert</code> メソッドのSQLにある MySQL の <code>now()</code> 関数で決まります。</p>
+<p>混乱しやすいので、次のように分けて考えてください。</p>
+<div class="table-wrap"><table><thead><tr><th>場所</th><th>書き方</th><th>役割</th></tr></thead><tbody><tr><td>Java側</td><td><code>&quot;now&quot;</code></td><td><code>Score</code> を作るために一時的に渡す文字列</td></tr><tr><td>SQL側</td><td><code>now()</code></td><td>DBの <code>datetime</code> 列に現在日時を登録する関数</td></tr></tbody></table></div>
+<p>つまり、<code>new Score(..., &quot;now&quot;)</code> の <code>&quot;now&quot;</code> がDBにそのまま入るわけではありません。 <code>dao.insert(score)</code> を呼び出すと、SQLの <code>now()</code> が実行され、その時点の現在日時が <code>datetime</code> に登録されます。</p>
 <p>登録後、<code>dao.select()</code> で取得した <code>ArrayList&lt;Score&gt;</code> をループ出力し、ヘッダ <code>*** ランキング ***</code> を付けます。</p>
 <div class="code-shell" data-lang="java"><div class="code-toolbar"><span>java</span><button type="button">コピー</button></div><pre><code><span class="tok-comment">// タイピング処理後…</span>
 <span class="code-comment"><span class="tok-comment">// ★時間計測を止める</span></span>
