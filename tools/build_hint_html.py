@@ -402,7 +402,7 @@ body {{
   border-bottom: 1px solid var(--line); margin: -12px 0 20px; padding: 12px 0 14px;
 }}
 .topbar-row {{
-  display: grid; grid-template-columns: 180px minmax(220px, 1fr) auto; gap: 12px;
+  display: grid; grid-template-columns: 180px minmax(220px, 1fr) auto auto; gap: 12px;
   align-items: center; margin-bottom: 10px;
 }}
 .schedule-banner {{
@@ -417,6 +417,40 @@ body {{
 .search-status {{
   color: var(--muted); font-size: 13px; white-space: nowrap; text-align: right;
 }}
+.instructor-button, .instructor-panel button {{
+  border: 1px solid var(--line-strong); background: white; color: #203431;
+  border-radius: 6px; padding: 8px 11px; cursor: pointer; font-weight: 700;
+}}
+.instructor-button:hover, .instructor-panel button:hover {{
+  border-color: var(--green); color: var(--green); background: var(--green-soft);
+}}
+.instructor-panel {{
+  display: none; margin: 12px 0 0; padding: 14px; border: 1px solid var(--line-strong);
+  border-radius: 8px; background: white;
+}}
+.instructor-panel.open {{ display: block; }}
+.instructor-panel h3 {{ margin: 0 0 10px; font-size: 16px; color: #243235; }}
+.instructor-login {{
+  display: grid; grid-template-columns: minmax(180px, 260px) auto; gap: 8px; align-items: center;
+}}
+.instructor-login input, .schedule-editor input {{
+  height: 36px; border: 1px solid var(--line); border-radius: 6px; padding: 0 9px;
+  font-family: inherit; font-size: 14px;
+}}
+.instructor-tools {{ display: none; }}
+.instructor-panel.authed .instructor-login {{ display: none; }}
+.instructor-panel.authed .instructor-tools {{ display: block; }}
+.instructor-actions {{ display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 10px 0; }}
+.instructor-actions label {{ display: inline-flex; align-items: center; gap: 6px; font-weight: 700; }}
+.instructor-status {{ color: var(--muted); font-size: 13px; }}
+.schedule-editor {{
+  display: grid; grid-template-columns: repeat(2, minmax(260px, 1fr)); gap: 8px 14px;
+  margin-top: 10px;
+}}
+.schedule-row {{
+  display: grid; grid-template-columns: 84px minmax(170px, 1fr); gap: 8px; align-items: center;
+}}
+.schedule-row span {{ font-weight: 700; color: #243235; }}
 .tabs {{
   display: flex; flex-wrap: wrap; gap: 8px;
 }}
@@ -560,6 +594,7 @@ figcaption {{ font-size: 13px; color: var(--muted); padding: 8px 12px; border-to
   .topbar {{ position: static; margin-top: 0; }}
   .topbar-row {{ grid-template-columns: 1fr; }}
   .search-status {{ text-align: left; }}
+  .instructor-login, .schedule-editor, .schedule-row {{ grid-template-columns: 1fr; }}
   .division-card {{ grid-template-columns: 1fr; }}
   .exercise {{ padding: 20px 16px; }}
   h1 {{ font-size: 27px; }}
@@ -575,6 +610,7 @@ figcaption {{ font-size: 13px; color: var(--muted); padding: 8px 12px; border-to
     <div class="brand">EIMS 個人演習のヒント</div>
     <input class="search" id="search" type="search" placeholder="演習番号・用語・コードを検索">
     <div class="search-status" id="searchStatus">{total_count}件表示中</div>
+    <button class="instructor-button" id="instructorButton" type="button">講師用</button>
   </div>
   <div class="tabs" role="tablist" aria-label="演習グループ">
     <button type="button" class="active" data-tab="all">すべて</button>
@@ -588,6 +624,23 @@ figcaption {{ font-size: 13px; color: var(--muted); padding: 8px 12px; border-to
     <strong>公開スケジュール:</strong>
     2026/6/9は演習1〜3、2026/6/10は演習4〜5を、演習ごとの予定時刻に合わせて表示します。
   </div>
+  <div class="instructor-panel" id="instructorPanel">
+    <h3>講師用メニュー</h3>
+    <div class="instructor-login">
+      <input id="instructorPassword" type="password" autocomplete="current-password" placeholder="パスワード">
+      <button id="instructorLogin" type="button">ログイン</button>
+    </div>
+    <p class="instructor-status" id="instructorStatus">講師はログインすると、公開時刻前でも全ヒントを確認できます。</p>
+    <div class="instructor-tools">
+      <div class="instructor-actions">
+        <label><input id="forceOpenHints" type="checkbox"> 全ヒントを強制表示</label>
+        <button id="saveSchedule" type="button">このPCに保存</button>
+        <button id="resetSchedule" type="button">初期時刻に戻す</button>
+        <button id="instructorLogout" type="button">ログアウト</button>
+      </div>
+      <div class="schedule-editor" id="scheduleEditor"></div>
+    </div>
+  </div>
 </div>
 {body}
 <p class="no-results" id="noResults">該当する演習がありません。検索語または公開時刻を確認してください。</p>
@@ -599,14 +652,101 @@ const sections = Array.from(document.querySelectorAll('.exercise'));
 const noResults = document.getElementById('noResults');
 const searchStatus = document.getElementById('searchStatus');
 const tabButtons = Array.from(document.querySelectorAll('[data-tab]'));
-const releaseSchedule = {release_schedule_json};
+const instructorButton = document.getElementById('instructorButton');
+const instructorPanel = document.getElementById('instructorPanel');
+const instructorPassword = document.getElementById('instructorPassword');
+const instructorLogin = document.getElementById('instructorLogin');
+const instructorLogout = document.getElementById('instructorLogout');
+const forceOpenHints = document.getElementById('forceOpenHints');
+const saveSchedule = document.getElementById('saveSchedule');
+const resetSchedule = document.getElementById('resetSchedule');
+const scheduleEditor = document.getElementById('scheduleEditor');
+const instructorStatus = document.getElementById('instructorStatus');
+const defaultReleaseSchedule = {release_schedule_json};
+const instructorPasswordHash = '37ae240244f300205edbbae2d790fa76351668469f9f37c968536b7843272a35';
+const authKey = 'eimsInstructorAuthed';
+const forceOpenKey = 'eimsInstructorForceOpen';
+const scheduleOverrideKey = 'eimsReleaseScheduleOverrides';
+let releaseSchedule = mergeReleaseSchedule(readJson(scheduleOverrideKey, {{}}));
+let isInstructor = localStorage.getItem(authKey) === 'true';
+let forceOpen = localStorage.getItem(forceOpenKey) !== 'false';
 let activeGroup = 'all';
+
+function readJson(key, fallback) {{
+  try {{
+    const value = localStorage.getItem(key);
+    return value ? JSON.parse(value) : fallback;
+  }} catch (error) {{
+    return fallback;
+  }}
+}}
+
+function writeJson(key, value) {{
+  localStorage.setItem(key, JSON.stringify(value));
+}}
+
+function mergeReleaseSchedule(overrides) {{
+  return {{ ...defaultReleaseSchedule, ...overrides }};
+}}
+
+function formatLabel(value) {{
+  if (!value) return '';
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return '';
+  return `${{date.getMonth() + 1}}/${{date.getDate()}} ${{String(date.getHours()).padStart(2, '0')}}:${{String(date.getMinutes()).padStart(2, '0')}}`;
+}}
+
+function toDatetimeLocalValue(value) {{
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return '';
+  const yyyy = date.getFullYear();
+  const mm = String(date.getMonth() + 1).padStart(2, '0');
+  const dd = String(date.getDate()).padStart(2, '0');
+  const hh = String(date.getHours()).padStart(2, '0');
+  const mi = String(date.getMinutes()).padStart(2, '0');
+  return `${{yyyy}}-${{mm}}-${{dd}}T${{hh}}:${{mi}}`;
+}}
+
+async function sha256(text) {{
+  const bytes = new TextEncoder().encode(text);
+  const hash = await crypto.subtle.digest('SHA-256', bytes);
+  return Array.from(new Uint8Array(hash)).map(byte => byte.toString(16).padStart(2, '0')).join('');
+}}
+
+function setInstructorStatus(message) {{
+  instructorStatus.textContent = message;
+}}
+
+function sectionLabel(section) {{
+  return section.dataset.title.replace(' のヒント', '');
+}}
+
+function buildScheduleEditor() {{
+  scheduleEditor.innerHTML = '';
+  sections.forEach(section => {{
+    const key = section.dataset.exercise;
+    const schedule = releaseSchedule[key];
+    if (!schedule) return;
+    const row = document.createElement('label');
+    row.className = 'schedule-row';
+    row.innerHTML = `<span>${{sectionLabel(section)}}</span><input type="datetime-local" data-schedule-key="${{key}}" value="${{toDatetimeLocalValue(schedule.datetime)}}">`;
+    scheduleEditor.appendChild(row);
+  }});
+}}
+
+function refreshInstructorUi() {{
+  instructorPanel.classList.toggle('authed', isInstructor);
+  forceOpenHints.checked = forceOpen;
+  instructorButton.textContent = isInstructor ? '講師用 ON' : '講師用';
+  buildScheduleEditor();
+}}
 
 function scheduleFor(section) {{
   return releaseSchedule[section.dataset.exercise] || null;
 }}
 
 function isReleased(section) {{
+  if (isInstructor && forceOpen) return true;
   const schedule = scheduleFor(section);
   if (!schedule || !schedule.datetime) return true;
   return Date.now() >= new Date(schedule.datetime).getTime();
@@ -655,7 +795,7 @@ function applyFilters() {{
     if (heading && schedule) {{
       const note = document.createElement('span');
       note.className = released ? 'release-note open' : 'release-note';
-      note.textContent = released ? '公開中' : releaseLabel(section);
+      note.textContent = isInstructor && forceOpen ? '講師表示中' : released ? '公開中' : releaseLabel(section);
       heading.appendChild(note);
     }}
     if (hit) shown++;
@@ -663,6 +803,80 @@ function applyFilters() {{
   noResults.style.display = shown ? 'none' : 'block';
   searchStatus.textContent = `${{shown}}件表示中`;
 }}
+
+instructorButton.addEventListener('click', () => {{
+  instructorPanel.classList.toggle('open');
+  if (instructorPanel.classList.contains('open')) {{
+    refreshInstructorUi();
+    if (!isInstructor) instructorPassword.focus();
+  }}
+}});
+
+instructorLogin.addEventListener('click', async () => {{
+  const input = instructorPassword.value;
+  let hash = '';
+  try {{
+    hash = await sha256(input);
+  }} catch (error) {{
+    setInstructorStatus('このブラウザではパスワード確認機能を利用できません。別のブラウザで開いてください。');
+    return;
+  }}
+  if (hash !== instructorPasswordHash) {{
+    setInstructorStatus('パスワードが違います。');
+    return;
+  }}
+  isInstructor = true;
+  forceOpen = true;
+  localStorage.setItem(authKey, 'true');
+  localStorage.setItem(forceOpenKey, 'true');
+  instructorPassword.value = '';
+  setInstructorStatus('講師としてログインしました。全ヒントを表示しています。');
+  refreshInstructorUi();
+  applyFilters();
+}});
+
+instructorPassword.addEventListener('keydown', event => {{
+  if (event.key === 'Enter') instructorLogin.click();
+}});
+
+instructorLogout.addEventListener('click', () => {{
+  isInstructor = false;
+  localStorage.removeItem(authKey);
+  setInstructorStatus('ログアウトしました。');
+  refreshInstructorUi();
+  applyFilters();
+}});
+
+forceOpenHints.addEventListener('change', () => {{
+  forceOpen = forceOpenHints.checked;
+  localStorage.setItem(forceOpenKey, String(forceOpen));
+  setInstructorStatus(forceOpen ? '全ヒントを強制表示しています。' : '強制表示をOFFにしました。設定した公開日時で動作確認できます。');
+  applyFilters();
+}});
+
+saveSchedule.addEventListener('click', () => {{
+  const overrides = {{}};
+  scheduleEditor.querySelectorAll('[data-schedule-key]').forEach(input => {{
+    if (!input.value) return;
+    overrides[input.dataset.scheduleKey] = {{
+      label: formatLabel(input.value),
+      datetime: input.value,
+    }};
+  }});
+  writeJson(scheduleOverrideKey, overrides);
+  releaseSchedule = mergeReleaseSchedule(overrides);
+  buildScheduleEditor();
+  setInstructorStatus('このPC用の公開日時を保存しました。強制表示をOFFにすると動作確認できます。');
+  applyFilters();
+}});
+
+resetSchedule.addEventListener('click', () => {{
+  localStorage.removeItem(scheduleOverrideKey);
+  releaseSchedule = mergeReleaseSchedule({{}});
+  buildScheduleEditor();
+  setInstructorStatus('公開日時を初期設定に戻しました。');
+  applyFilters();
+}});
 
 search.addEventListener('input', applyFilters);
 tabButtons.forEach(button => {{
