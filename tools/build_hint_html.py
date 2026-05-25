@@ -287,7 +287,7 @@ def render_blocks(markdown: str) -> tuple[str, list[tuple[str, str, str]]]:
             parts.append(
                 f'<header class="doc-hero"><p class="kicker">EIMS 個人演習</p>'
                 f"<h1>{inline(title)}</h1>"
-        f"<p>ヒントを演習ごとに整理し、参照テキスト・コード・重要ポイントを読みやすくまとめたHTML版です。</p></header>"
+        f"<p>ヒントを演習ごとに整理し、参照テキスト・コード・重要ポイントを読みやすくまとめています。</p></header>"
             )
             i += 1
             continue
