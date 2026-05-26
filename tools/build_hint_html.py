@@ -285,7 +285,7 @@ def render_blocks(markdown: str) -> tuple[str, list[tuple[str, str, str]]]:
             flush_list()
             title = line[2:].strip()
             parts.append(
-                f'<header class="doc-hero"><p class="kicker">EIMS 個人演習</p>'
+                f'<header class="doc-hero"><p class="kicker">Java個人演習</p>'
                 f"<h1>{inline(title)}</h1>"
         f"<p>ヒントを演習ごとに整理し、参照テキスト・コード・重要ポイントを読みやすくまとめています。</p></header>"
             )
@@ -366,7 +366,7 @@ def build_html(body: str, toc: list[tuple[str, str, str]]) -> str:
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>EIMS個人演習のヒント（総合版）</title>
+<title>Java個人演習「タイピングテストアプリ」のヒント</title>
 <style>
 :root {{
   --bg: #f7f8f5;
@@ -615,7 +615,7 @@ figcaption {{ font-size: 13px; color: var(--muted); padding: 8px 12px; border-to
 <main>
 <div class="topbar">
   <div class="topbar-row">
-    <div class="brand">EIMS 個人演習のヒント</div>
+    <div class="brand">Java個人演習「タイピングテストアプリ」</div>
     <input class="search" id="search" type="search" placeholder="演習番号・用語・コードを検索">
     <div class="search-status" id="searchStatus">{total_count}件表示中</div>
     <button class="instructor-button" id="instructorButton" type="button">講師用</button>

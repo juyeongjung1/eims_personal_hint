@@ -3,7 +3,7 @@ import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const OUT = path.join(ROOT, "EIMS個人演習ヒント_講師向けマニュアル.pptx");
+const OUT = path.join(ROOT, "Java個人演習_タイピングテストアプリ_講師向けマニュアル.pptx");
 const PREVIEW_DIR = path.join(ROOT, "outputs", "instructor-manual-preview");
 const runtimeRoot = path.join(
   process.env.USERPROFILE || process.env.HOME,
@@ -93,7 +93,7 @@ function bullet(slide, text, x, y, w, accent = C.green) {
   addText(slide, text, { x: x + 18, y, w, h: 42, size: 18, color: C.ink });
 }
 
-function screenFrame(slide, x, y, w, h, title = "EIMS 個人演習のヒント") {
+function screenFrame(slide, x, y, w, h, title = "Java個人演習「タイピングテストアプリ」") {
   addShape(slide, { x, y, w, h, fill: "#FFFFFF", line: "#C9D3CF", lineWidth: 1 });
   addShape(slide, { x, y, w, h: 38, fill: "#EEF4F1", line: "#C9D3CF", lineWidth: 1 });
   addShape(slide, { x: x + 15, y: y + 14, w: 9, h: 9, fill: "#FF6B6B", line: "#FF6B6B" });
@@ -104,7 +104,7 @@ function screenFrame(slide, x, y, w, h, title = "EIMS 個人演習のヒント")
 
 function drawTopbarMock(slide, x, y, w) {
   addShape(slide, { x, y, w, h: 88, fill: "#F7F8F5", line: C.line, lineWidth: 1 });
-  addText(slide, "EIMS 個人演習のヒント", { x: x + 18, y: y + 16, w: 150, h: 24, size: 12, color: C.green, bold: true });
+  addText(slide, "Java個人演習", { x: x + 18, y: y + 16, w: 150, h: 24, size: 12, color: C.green, bold: true });
   addShape(slide, { x: x + 180, y: y + 12, w: 270, h: 34, fill: "#FFFFFF", line: C.line, lineWidth: 1 });
   addText(slide, "演習番号・用語・コードを検索", { x: x + 192, y: y + 20, w: 240, h: 20, size: 11, color: C.muted });
   addText(slide, "15件表示中", { x: x + 465, y: y + 20, w: 78, h: 20, size: 11, color: C.muted, align: "right" });
@@ -129,8 +129,8 @@ function slide1(p) {
   const slide = p.slides.add();
   addShape(slide, { x: 0, y: 0, w: W, h: H, fill: C.dark });
   addShape(slide, { x: 0, y: 0, w: 18, h: H, fill: C.green });
-  addText(slide, "EIMS 個人演習", { x: 76, y: 80, w: 360, h: 28, size: 18, color: "#9FE2C8", bold: true });
-  addText(slide, "ヒントHTML\n講師向けマニュアル", { x: 76, y: 132, w: 760, h: 150, size: 50, color: "#FFFFFF", bold: true });
+  addText(slide, "Java個人演習「タイピングテストアプリ」", { x: 76, y: 80, w: 520, h: 28, size: 18, color: "#9FE2C8", bold: true });
+  addText(slide, "ヒント資料\n講師向けマニュアル", { x: 76, y: 132, w: 760, h: 150, size: 50, color: "#FFFFFF", bold: true });
   addText(slide, "公開時間制御・講師用モード・検索ハイライト・当日運用の確認ポイント", { x: 80, y: 316, w: 760, h: 46, size: 21, color: "#D7E3DE" });
   screenFrame(slide, 805, 130, 355, 280);
   drawTopbarMock(slide, 825, 185, 315);
