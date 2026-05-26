@@ -129,7 +129,7 @@ function slide1(p) {
   const slide = p.slides.add();
   addShape(slide, { x: 0, y: 0, w: W, h: H, fill: C.dark });
   addShape(slide, { x: 0, y: 0, w: 18, h: H, fill: C.green });
-  addText(slide, "Java個人演習「タイピングテストアプリ」", { x: 76, y: 80, w: 520, h: 28, size: 18, color: "#9FE2C8", bold: true });
+  addText(slide, "Java個人演習\n「タイピングテストアプリ」", { x: 76, y: 72, w: 520, h: 58, size: 18, color: "#9FE2C8", bold: true });
   addText(slide, "ヒント資料\n講師向けマニュアル", { x: 76, y: 132, w: 760, h: 150, size: 50, color: "#FFFFFF", bold: true });
   addText(slide, "公開時間制御・講師用モード・検索ハイライト・当日運用の確認ポイント", { x: 80, y: 316, w: 760, h: 46, size: 21, color: "#D7E3DE" });
   screenFrame(slide, 805, 130, 355, 280);

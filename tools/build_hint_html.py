@@ -84,6 +84,12 @@ def inline(text: str) -> str:
     return escaped
 
 
+def title_inline(text: str) -> str:
+    if text == "Java個人演習「タイピングテストアプリ」のヒント":
+        return "Java個人演習<br>「タイピングテストアプリ」のヒント"
+    return inline(text)
+
+
 def long_division_html(code: str) -> str:
     values = {}
     for line in code.splitlines():
@@ -286,7 +292,7 @@ def render_blocks(markdown: str) -> tuple[str, list[tuple[str, str, str]]]:
             title = line[2:].strip()
             parts.append(
                 f'<header class="doc-hero"><p class="kicker">Java個人演習</p>'
-                f"<h1>{inline(title)}</h1>"
+                f"<h1>{title_inline(title)}</h1>"
         f"<p>ヒントを演習ごとに整理し、参照テキスト・コード・重要ポイントを読みやすくまとめています。</p></header>"
             )
             i += 1
